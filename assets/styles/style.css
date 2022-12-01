@@ -4,6 +4,31 @@
   box-sizing: border-box;
 }
 
+:root {
+  --white: #ffffff;
+  --dark-color-text: #491a1a;
+  --light-color-text: #757575;
+  --very-light-color-details: #bdbdbd;
+
+  --red-dark: #d32f2f;
+  --red-light: #ffe3e6;
+  --red-primary: #f44336;
+  --red-accent: #ff5252;
+  --red-accent-light: #ff525281;
+
+  --teal-dark: #00796b;
+  --teal-light: #b2dfdb;
+  --teal-primary: #009688;
+  --teal-accent: #009688;
+  --teal-accent-light: #00968780;
+
+  --indigo-dark: #303f9f;
+  --indigo-light: #c5cae9;
+  --indigo-primary: #3f51b5;
+  --indigo-accent: #536dfe;
+  --indigo-accent-light: #536dfe80;
+}
+
 html {
   font-size: 62.5%;
 }
@@ -29,7 +54,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgb(177, 137, 214);
+  background-color: var(--red-light);
   width: 100vw;
   height: 100vh;
 }
@@ -40,8 +65,8 @@ section {
   align-items: center;
   gap: 2rem;
   padding: 3rem;
-  background-color: rgb(210, 190, 228);
-  color: rgb(66, 32, 32);
+  background-color: var(--red-accent-light);
+  color: var(--dark-color-text);
   border-radius: 5px;
 }
 
@@ -49,6 +74,7 @@ section {
   display: flex;
   gap: 4rem;
   font-size: 1.4rem;
+  margin-bottom: 2rem;
 }
 
 .timer {
@@ -56,9 +82,11 @@ section {
   font-weight: 600;
 }
 
-section button {
+.btn {
   padding: 1rem 5rem;
   border: none;
   border-radius: 5px;
   font-size: 2rem;
+  background-color: var(--red-accent);
+  color: var(--white);
 }
