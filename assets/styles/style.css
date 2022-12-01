@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -35,19 +37,21 @@ html {
 
 body {
   font-size: 1.6rem;
+  font-family: 'Outfit', sans-serif;
+  color: var(--dark-color-text);
 }
 
 header {
   display: flex;
   justify-content: center;
+  align-items: center;
+  height: 7rem;
 }
 
 header nav {
   display: flex;
   justify-content: space-around;
-  padding: 3rem;
   width: 90%;
-  border-bottom: 1px solid rgb(170, 157, 170);
 }
 
 main {
@@ -62,9 +66,10 @@ main {
 section {
   display: flex;
   flex-direction: column;
+
   align-items: center;
   gap: 2rem;
-  padding: 3rem;
+  padding: 3rem 4rem;
   background-color: var(--red-accent-light);
   color: var(--dark-color-text);
   border-radius: 5px;
@@ -72,21 +77,27 @@ section {
 
 .timer-type {
   display: flex;
-  gap: 4rem;
-  font-size: 1.4rem;
+  gap: 6rem;
   margin-bottom: 2rem;
+}
+
+.timer-type h2 {
+  font-size: 2rem;
+  font-weight: 500;
 }
 
 .timer {
   font-size: 15rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .btn {
   padding: 1rem 5rem;
   border: none;
   border-radius: 5px;
-  font-size: 2rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  cursor: pointer;
   background-color: var(--red-accent);
   color: var(--white);
 }
