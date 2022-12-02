@@ -1,0 +1,42 @@
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --white: #ffffff;
+  --dark-color-text: #491a1a;
+  --light-color-text: #757575;
+  --very-light-color-details: #bdbdbd;
+
+  --red-dark: #d32f2f;
+  --red-light: #ffe3e6;
+  --red-primary: #f44336;
+  --red-accent: #ff5252;
+  --red-accent-light: #ff525281;
+
+  --teal-dark: #00796b;
+  --teal-light: #b2dfdb;
+  --teal-primary: #009688;
+  --teal-accent: #009688;
+  --teal-accent-light: #00968780;
+
+  --indigo-dark: #303f9f;
+  --indigo-light: #c5cae9;
+  --indigo-primary: #3f51b5;
+  --indigo-accent: #536dfe;
+  --indigo-accent-light: #536dfe80;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  font-family: 'Outfit', sans-serif;
+  color: var(--dark-color-text);
+}
