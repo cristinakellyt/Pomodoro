@@ -2,11 +2,11 @@ const focusTimer = document.getElementById('focus-timer');
 const shortBreak = document.getElementById('short-break');
 const longBreak = document.getElementById('long-break');
 const allTimerTypes = document.querySelectorAll('.timer-type h2');
-const allTimerType = document.querySelector('.timer-type');
 const countdown = document.querySelector('.countdown');
 const btnStart = document.getElementById('btn-start');
 let minutes = 25;
 let seconds = 0;
+let boundFn;
 
 function setCountdown(min, sec) {
   minutes = min < 10 ? '0' + min : min;
@@ -41,6 +41,9 @@ function changeColorHandler(color, allTimerTypes, min, sec, event) {
 }
 
 function startTimer() {
+  btnStart.textContent = 'Pause';
+  btnStart.removeEventListener('click', startTimer);
+
   minutes = Number(minutes);
   seconds = Number(seconds);
 
@@ -50,15 +53,29 @@ function startTimer() {
     timerTotal--;
     if (timerTotal <= 0) {
       clearInterval(timer);
+      btnStart.textContent = 'Restart';
     }
+
     minutes = parseInt(timerTotal / 60);
     seconds = parseInt(timerTotal % 60);
 
     minutes = minutes < 10 ? '0' + minutes : minutes;
     seconds = seconds < 10 ? '0' + seconds : seconds;
 
-    countdown.textContent = minutes + ':' + seconds;
+    countdown.textContent = `${minutes}:${seconds}`;
   }, 1000);
+
+  boundFn = stopTimer.bind(this, timer);
+  btnStart.addEventListener('click', boundFn);
+  console.log('start');
+}
+
+function stopTimer(timer) {
+  console.log('stop');
+  btnStart.textContent = 'Start';
+  clearInterval(timer);
+  btnStart.addEventListener('click', startTimer);
+  btnStart.removeEventListener('click', boundFn);
 }
 
 shortBreak.addEventListener(
@@ -75,4 +92,5 @@ focusTimer.addEventListener(
   'click',
   changeColorHandler.bind(this, 'red', allTimerTypes, 25, 00)
 );
+
 btnStart.addEventListener('click', startTimer);
