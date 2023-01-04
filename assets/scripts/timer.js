@@ -1,96 +1,62 @@
-const focusTimer = document.getElementById('focus-timer');
-const shortBreak = document.getElementById('short-break');
-const longBreak = document.getElementById('long-break');
-const allTimerTypes = document.querySelectorAll('.timer-type h2');
-const countdown = document.querySelector('.countdown');
-const btnStart = document.getElementById('btn-start');
-let minutes = 25;
-let seconds = 0;
-let boundFn;
+const TIMER_COUNTDOWN = 0;
+const TIMER_COUNTUP = 1;
 
-function setCountdown(min, sec) {
-  minutes = min < 10 ? '0' + min : min;
-  seconds = sec < 10 ? '0' + sec : sec;
-  countdown.textContent = `${minutes}:${seconds}`;
-}
+class Timer {
+  constructor(min, sec, type = TIMER_COUNTDOWN) {
+    this.minutes = Number(min);
+    this.seconds = Number(sec);
+    this.timerId;
+    this.type = type;
+    this.uiTime;
+    this.timerTotal = this.minutes * 60 + this.seconds;
+  }
 
-setCountdown(minutes, seconds);
+  start() {
+    this.timerId = setInterval(() => {
+      this.type == TIMER_COUNTDOWN ? this.countDown() : this.countUp();
+    }, 1000);
+    console.log('start');
+  }
 
-function changeColorHandler(color, allTimerTypes, min, sec, event) {
-  const main = document.getElementById('main');
-  const sectionTimer = document.getElementById('section-timer');
+  stop() {
+    console.log('stop');
+    clearInterval(this.timerId);
+  }
 
-  main.style.backgroundColor = `var(--${color}-light)`;
-  sectionTimer.style.backgroundColor = `var(--${color}-accent-light)`;
-  btnStart.style.backgroundColor = `var(--${color}-accent)`;
-  event.target.style.backgroundColor = `var(--${color}-primary)`;
+  countUp() {
+    console.log('not implemented');
+  }
 
-  setCountdown(min, sec);
-
-  allTimerTypes.forEach((element) => {
-    element.addEventListener(
-      'mouseover',
-      () => (element.style.backgroundColor = `var(--${color}-primary`)
-    );
-
-    element.addEventListener(
-      'mouseleave',
-      () => (element.style.backgroundColor = 'transparent')
-    );
-  });
-}
-
-function startTimer() {
-  btnStart.textContent = 'Pause';
-  btnStart.removeEventListener('click', startTimer);
-
-  minutes = Number(minutes);
-  seconds = Number(seconds);
-
-  let timerTotal = minutes * 60 + seconds;
-
-  let timer = setInterval(() => {
-    timerTotal--;
-    if (timerTotal <= 0) {
-      clearInterval(timer);
-      btnStart.textContent = 'Restart';
+  countDown() {
+    this.timerTotal--;
+    if (this.timerTotal <= 0) {
+      this.stop();
     }
 
-    minutes = parseInt(timerTotal / 60);
-    seconds = parseInt(timerTotal % 60);
+    this.minutes = parseInt(this.timerTotal / 60);
+    this.seconds = parseInt(this.timerTotal % 60);
 
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    seconds = seconds < 10 ? '0' + seconds : seconds;
+    this.minutes = this.minutes < 10 ? '0' + this.minutes : this.minutes;
+    this.seconds = this.seconds < 10 ? '0' + this.seconds : this.seconds;
 
-    countdown.textContent = `${minutes}:${seconds}`;
-  }, 1000);
+    console.log(`${this.minutes}:${this.seconds}`);
+    this.uiTime = `${this.minutes}:${this.seconds}`;
+  }
 
-  boundFn = stopTimer.bind(this, timer);
-  btnStart.addEventListener('click', boundFn);
-  console.log('start');
+  getTime() {
+    return this.uiTime;
+  }
 }
 
-function stopTimer(timer) {
-  console.log('stop');
-  btnStart.textContent = 'Start';
-  clearInterval(timer);
-  btnStart.addEventListener('click', startTimer);
-  btnStart.removeEventListener('click', boundFn);
-}
+// let timer1 = new Timer(0, 10);
+// timer1.start();
 
-shortBreak.addEventListener(
-  'click',
-  changeColorHandler.bind(this, 'teal', allTimerTypes, 0, 10)
-);
+// setTimeout(() => {
+//   timer1.stopTimer();
+// }, 2000);
+// btnStart.addEventListener('click', startTimer);
 
-longBreak.addEventListener(
-  'click',
-  changeColorHandler.bind(this, 'indigo', allTimerTypes, 15, 00)
-);
+// let timer2 = new Timer(0, 30, TIMER_COUNTUP);
+// timer2.start();
 
-focusTimer.addEventListener(
-  'click',
-  changeColorHandler.bind(this, 'red', allTimerTypes, 25, 00)
-);
-
-btnStart.addEventListener('click', startTimer);
+export { Timer };
