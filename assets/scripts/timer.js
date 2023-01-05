@@ -48,15 +48,4 @@ class Timer {
   }
 }
 
-// let timer1 = new Timer(0, 10);
-// timer1.start();
-
-// setTimeout(() => {
-//   timer1.stopTimer();
-// }, 2000);
-// btnStart.addEventListener('click', startTimer);
-
-// let timer2 = new Timer(0, 30, TIMER_COUNTUP);
-// timer2.start();
-
 export { Timer };
