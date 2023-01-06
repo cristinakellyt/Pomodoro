@@ -1,5 +1,7 @@
 const main = document.getElementById('main');
 
+import { Timer, TIMER_COUNTDOWN, TIMER_COUNTUP } from './timer.js';
+
 class uiTimer {
   constructor(main, color) {
     this.main = main;
@@ -10,6 +12,8 @@ class uiTimer {
     this.shortBreak;
     this.longBreak;
     this.start_pauseBtn;
+    this.timerText;
+    this.defaultTimeCountdown = new Timer(10, 0, TIMER_COUNTDOWN);
     this.createTimerElements();
   }
 
@@ -24,6 +28,7 @@ class uiTimer {
     this.sectionTimer.append(this.start_pauseBtn);
 
     this.changeUiColor();
+    this.renderTimer();
 
     this.focusTimer.addEventListener(
       'click',
@@ -65,6 +70,41 @@ class uiTimer {
     );
   }
 
+  renderTimer() {
+    this.timerText.textContent = this.defaultTimeCountdown.getTime();
+
+    this.boundFnToStartTimer = this.btnStartTimer.bind(this);
+
+    this.start_pauseBtn.addEventListener('click', this.boundFnToStartTimer);
+  }
+
+  btnStartTimer() {
+    console.log('start ui');
+    this.start_pauseBtn.removeEventListener('click', this.boundFnToStartTimer);
+    this.defaultTimeCountdown.start();
+
+    this.start_pauseBtn.textContent = 'Pause';
+
+    let timerId = setInterval(() => {
+      if (this.defaultTimeCountdown.getTime() === '00:00') {
+        clearInterval(timerId);
+      }
+      this.timerText.textContent = this.defaultTimeCountdown.getTime();
+    }, 1000);
+
+    this.boundFnToPauseTimer = this.btnPauseTimer.bind(this, timerId);
+    this.start_pauseBtn.addEventListener('click', this.boundFnToPauseTimer);
+  }
+
+  btnPauseTimer(timerId) {
+    console.log('pause ui');
+    clearInterval(timerId);
+    this.defaultTimeCountdown.pause();
+    this.start_pauseBtn.textContent = 'Start';
+    this.start_pauseBtn.removeEventListener('click', this.boundFnToPauseTimer);
+    this.start_pauseBtn.addEventListener('click', this.boundFnToStartTimer);
+  }
+
   createTimerElements() {
     this.sectionTimer = document.createElement('section');
 
@@ -85,7 +125,6 @@ class uiTimer {
 
     this.timerText = document.createElement('p');
     this.timerText.className = 'countdown';
-    this.timerText.textContent = '00:00';
 
     this.start_pauseBtn = document.createElement('button');
     this.start_pauseBtn.className = 'btn';

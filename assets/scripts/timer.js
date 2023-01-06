@@ -7,19 +7,20 @@ class Timer {
     this.seconds = Number(sec);
     this.timerId;
     this.type = type;
-    this.uiTime;
+    this.uiTime = `${this.minutes}:${this.seconds}`;
     this.timerTotal = this.minutes * 60 + this.seconds;
   }
 
   start() {
     this.timerId = setInterval(() => {
       this.type == TIMER_COUNTDOWN ? this.countDown() : this.countUp();
+      console.log('callback', this.uiTime);
     }, 1000);
     console.log('start');
   }
 
-  stop() {
-    console.log('stop');
+  pause() {
+    console.log('pause');
     clearInterval(this.timerId);
   }
 
@@ -30,7 +31,7 @@ class Timer {
   countDown() {
     this.timerTotal--;
     if (this.timerTotal <= 0) {
-      this.stop();
+      this.pause();
     }
 
     this.minutes = parseInt(this.timerTotal / 60);
@@ -39,7 +40,6 @@ class Timer {
     this.minutes = this.minutes < 10 ? '0' + this.minutes : this.minutes;
     this.seconds = this.seconds < 10 ? '0' + this.seconds : this.seconds;
 
-    console.log(`${this.minutes}:${this.seconds}`);
     this.uiTime = `${this.minutes}:${this.seconds}`;
   }
 
@@ -48,4 +48,4 @@ class Timer {
   }
 }
 
-export { Timer };
+export { Timer, TIMER_COUNTDOWN, TIMER_COUNTUP };
