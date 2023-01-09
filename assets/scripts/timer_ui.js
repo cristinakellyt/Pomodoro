@@ -13,7 +13,7 @@ class uiTimer {
     this.longBreak;
     this.start_pauseBtn;
     this.timerText;
-    this.defaultTimeCountdown = new Timer(10, 0, TIMER_COUNTDOWN);
+    this.defaultTimeCountdown = new Timer(9, 3, TIMER_COUNTDOWN);
     this.createTimerElements();
   }
 
@@ -71,7 +71,7 @@ class uiTimer {
   }
 
   renderTimer() {
-    this.timerText.textContent = this.defaultTimeCountdown.getTime();
+    this.timerText.textContent = this.defaultTimeCountdown.getUiTime();
 
     this.boundFnToStartTimer = this.btnStartTimer.bind(this);
 
@@ -86,10 +86,10 @@ class uiTimer {
     this.start_pauseBtn.textContent = 'Pause';
 
     let timerId = setInterval(() => {
-      if (this.defaultTimeCountdown.getTime() === '00:00') {
+      if (this.defaultTimeCountdown.getUiTime() === '00:00') {
         clearInterval(timerId);
       }
-      this.timerText.textContent = this.defaultTimeCountdown.getTime();
+      this.timerText.textContent = this.defaultTimeCountdown.getUiTime();
     }, 1000);
 
     this.boundFnToPauseTimer = this.btnPauseTimer.bind(this, timerId);

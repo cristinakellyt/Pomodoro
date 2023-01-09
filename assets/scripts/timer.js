@@ -5,10 +5,10 @@ class Timer {
   constructor(min, sec, type = TIMER_COUNTDOWN) {
     this.minutes = Number(min);
     this.seconds = Number(sec);
+    this.timerTotal = this.minutes * 60 + this.seconds;
     this.timerId;
     this.type = type;
-    this.uiTime = `${this.minutes}:${this.seconds}`;
-    this.timerTotal = this.minutes * 60 + this.seconds;
+    this.setUiTime();
   }
 
   start() {
@@ -37,14 +37,18 @@ class Timer {
     this.minutes = parseInt(this.timerTotal / 60);
     this.seconds = parseInt(this.timerTotal % 60);
 
+    this.setUiTime();
+  }
+
+  getUiTime() {
+    return this.uiTime;
+  }
+
+  setUiTime() {
     this.minutes = this.minutes < 10 ? '0' + this.minutes : this.minutes;
     this.seconds = this.seconds < 10 ? '0' + this.seconds : this.seconds;
 
     this.uiTime = `${this.minutes}:${this.seconds}`;
-  }
-
-  getTime() {
-    return this.uiTime;
   }
 }
 
