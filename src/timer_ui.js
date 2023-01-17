@@ -11,10 +11,7 @@ class UiTimer {
     this.btnShortBreak;
     this.btnLongBreak;
     this.btnStartPause;
-    this.timerFocus = new Timer(25, 0, TIMER_COUNTDOWN);
-    this.timerShortBreak = new Timer(5, 0, TIMER_COUNTDOWN);
-    this.timerLongBreak = new Timer(10, 0, TIMER_COUNTDOWN);
-    this.timerCurrent = this.timerFocus;
+    this.timer = new Timer(25, 0, TIMER_COUNTDOWN);
     this.#createUIElements();
   }
 
@@ -67,13 +64,13 @@ class UiTimer {
     this.btnStartPause.className = 'btn';
     this.btnStartPause.id = 'btn-start';
     this.btnStartPause.textContent = 'Start';
-    this.boundFnToStartTimer = this.#startTimer.bind(this);
+    this.boundFnToStartTimer = this.#startTimerUi.bind(this);
     this.btnStartPause.addEventListener('click', this.boundFnToStartTimer);
   }
 
   #setTimerText() {
-    console.log(this.timerCurrent);
-    this.timerTextEl.textContent = this.timerCurrent.getUiTime();
+    console.log(this.timer);
+    this.timerTextEl.textContent = this.timer.getUiTime();
   }
 
   #updateUiColor(color, event) {
@@ -84,12 +81,9 @@ class UiTimer {
     if (event) {
       event.target.style.backgroundColor = `var(--${color}-accent)`;
     }
-    console.log(event);
   }
 
   #mouseHoverColor(event) {
-    console.log(event);
-    console.log('hi');
     event.target.style.backgroundColor = `var(--${this.color}-accent)`;
   }
 
@@ -98,48 +92,59 @@ class UiTimer {
   }
 
   #setCurrentTimer(event) {
-    console.log(event);
-    // this.boundFnToStartTimer = this.#startTimer.bind(this);
     this.btnStartPause.removeEventListener('click', this.boundFnToStartTimer);
 
+    this.#stopTimerUi();
+
     if (event.target === this.btnFocusTimer) {
-      this.timerCurrent = this.timerFocus;
+      this.timer.setTimerValues(25, 0);
     } else if (event.target === this.btnShortBreak) {
-      this.timerCurrent = this.timerShortBreak;
-    } else if (event.target === this.btnLongBreak) {
-      this.timerCurrent = this.timerLongBreak;
+      this.timer.setTimerValues(5, 0);
+    } else {
+      this.timer.setTimerValues(10, 0);
+    }
+
+    if (this.btnStartPause.textContent === 'Pause') {
+      this.btnStartPause.textContent = 'Start';
     }
 
     this.btnStartPause.addEventListener('click', this.boundFnToStartTimer);
     this.#setTimerText();
   }
 
-  #startTimer() {
+  #startTimerUi() {
     console.log('start ui');
 
     this.btnStartPause.removeEventListener('click', this.boundFnToStartTimer);
 
-    this.timerCurrent.start();
+    this.timer.start();
     this.btnStartPause.textContent = 'Pause';
 
-    let timerId = setInterval(() => {
-      if (this.timerCurrent.getUiTime() === '00:00') {
+    this.timerId = setInterval(() => {
+      if (this.timer.getUiTime() === '00:00') {
         clearInterval(timerId);
       }
-      this.timerTextEl.textContent = this.timerCurrent.getUiTime();
+      this.timerTextEl.textContent = this.timer.getUiTime();
     }, 1000);
 
-    this.boundFnToPauseTimer = this.#pauseTimer.bind(this, timerId);
+    this.boundFnToPauseTimer = this.#pauseTimer.bind(this);
     this.btnStartPause.addEventListener('click', this.boundFnToPauseTimer);
   }
 
-  #pauseTimer(timerId) {
+  #pauseTimer() {
     console.log('pause ui');
-    clearInterval(timerId);
-    this.timerCurrent.pause();
+    clearInterval(this.timerId);
+    this.timer.pause();
     this.btnStartPause.textContent = 'Start';
     this.btnStartPause.removeEventListener('click', this.boundFnToPauseTimer);
     this.btnStartPause.addEventListener('click', this.boundFnToStartTimer);
+  }
+
+  #stopTimerUi() {
+    console.log('stop ui');
+    clearInterval(this.timerId);
+    this.timer.stop();
+    this.#setTimerText();
   }
 }
 

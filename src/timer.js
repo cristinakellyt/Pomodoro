@@ -3,6 +3,8 @@ const TIMER_COUNTUP = 1;
 
 class Timer {
   constructor(min, sec, type = TIMER_COUNTDOWN) {
+    this.initialMin = Number(min);
+    this.initialSec = Number(sec);
     this.minutes = Number(min);
     this.seconds = Number(sec);
     this.timerTotal = this.minutes * 60 + this.seconds;
@@ -22,6 +24,21 @@ class Timer {
   pause() {
     console.log('pause');
     clearInterval(this.timerId);
+  }
+
+  stop() {
+    console.log('stop');
+    clearInterval(this.timerId);
+    this.setTimerValues(this.initialMin, this.initialSec);
+  }
+
+  setTimerValues(min, sec) {
+    this.minutes = min;
+    this.seconds = sec;
+    this.initialMin = this.minutes;
+    this.initialSec = this.seconds;
+    this.timerTotal = this.minutes * 60 + this.seconds;
+    this.setUiTime();
   }
 
   countUp() {
