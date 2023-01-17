@@ -1,6 +1,6 @@
-import { uiTimer } from './timer_ui.js';
+import { UiTimer } from './timer_ui.js';
 
 const main = document.getElementById('main');
 
-let pomodoro = new uiTimer(main, 'red');
+const pomodoro = new UiTimer(main, 'red');
 pomodoro.render();
