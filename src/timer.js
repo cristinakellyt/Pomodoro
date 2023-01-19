@@ -30,6 +30,13 @@ class Timer {
     console.log('start');
   }
 
+  restart() {
+    console.log('restart timer');
+    clearInterval(this.#timerId);
+    this.setTimerValues(this.#initialMin, this.#initialSec);
+    this.start();
+  }
+
   pause() {
     console.log('pause');
     clearInterval(this.#timerId);
