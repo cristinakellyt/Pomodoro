@@ -12,14 +12,8 @@ class Timer {
   #uiTime;
 
   constructor(min, sec, type = TIMER_COUNTDOWN) {
-    this.#initialMin = Number(min);
-    this.#initialSec = Number(sec);
-    this.#minutes = Number(min);
-    this.#seconds = Number(sec);
-    this.#timerTotal = this.#minutes * 60 + this.#seconds;
-    this.#timerId;
+    this.setTimerValues(min, sec);
     this.#type = type;
-    this.#setUiTime();
   }
 
   start() {
@@ -49,6 +43,18 @@ class Timer {
   }
 
   setTimerValues(min, sec) {
+    if (!(sec >= 0 && sec <= 59) || !Number.isInteger(sec)) {
+      throw new Error(
+        `Invalid parameter. Seconds should be a positive integer number between 0 and 59`
+      );
+    }
+
+    if (!Number.isInteger(min) || !(min >= 0)) {
+      throw new Error(
+        `Invalid parameter. Minutes should be a positive integer number`
+      );
+    }
+
     this.#minutes = min;
     this.#seconds = sec;
     this.#initialMin = this.#minutes;
@@ -59,6 +65,14 @@ class Timer {
 
   getUiTime() {
     return this.#uiTime;
+  }
+
+  getMinutes() {
+    return this.#minutes;
+  }
+
+  getSeconds() {
+    return this.#seconds;
   }
 
   #countUp() {
