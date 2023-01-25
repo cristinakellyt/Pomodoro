@@ -1,4 +1,4 @@
-import { Timer, TIMER_COUNTDOWN, TIMER_COUNTUP } from './timer.js';
+import { Timer } from './timer.js';
 
 class UiTimer {
   constructor(main, color) {
@@ -11,7 +11,7 @@ class UiTimer {
     this.btnShortBreak;
     this.btnLongBreak;
     this.btnStartPause;
-    this.timer = new Timer(25, 0, TIMER_COUNTDOWN);
+    this.timer = new Timer(25, 0, Timer.types.countdown);
     this.#createUIElements();
   }
 
@@ -122,7 +122,7 @@ class UiTimer {
 
     this.timerId = setInterval(() => {
       if (this.timer.getUiTime() === '00:00') {
-        clearInterval(timerId);
+        clearInterval(this.timerId);
       }
       this.timerTextEl.textContent = this.timer.getUiTime();
     }, 1000);

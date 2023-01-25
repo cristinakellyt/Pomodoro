@@ -1,26 +1,38 @@
-const TIMER_COUNTDOWN = 0;
-const TIMER_COUNTUP = 1;
-
 class Timer {
   #initialMin;
   #initialSec;
   #minutes;
   #seconds;
+  #uiTime;
   #timerTotal;
   #timerId;
-  #type;
-  #uiTime;
+  #timerType;
+  #timerStatus;
 
-  constructor(min, sec, type = TIMER_COUNTDOWN) {
+  static status = Object.freeze({
+    running: 'running',
+    paused: 'paused',
+    stopped: 'stopped',
+  });
+
+  static types = Object.freeze({
+    countdown: 'countDown',
+    countUp: 'countUp',
+  });
+
+  constructor(min, sec, type = Timer.types.countdown) {
     this.setTimerValues(min, sec);
-    this.#type = type;
+    this.#timerType = type;
   }
 
   start() {
     this.#timerId = setInterval(() => {
-      this.#type == TIMER_COUNTDOWN ? this.#countDown() : this.#countUp();
+      this.#timerType === Timer.types.countdown
+        ? this.#countDown()
+        : this.#countUp();
       console.log('callback', this.#uiTime);
     }, 1000);
+    this.#timerStatus = Timer.status.running;
     console.log('start');
   }
 
@@ -34,12 +46,14 @@ class Timer {
   pause() {
     console.log('pause');
     clearInterval(this.#timerId);
+    this.#timerStatus = Timer.status.paused;
   }
 
   stop() {
     console.log('stop');
     clearInterval(this.#timerId);
     this.setTimerValues(this.#initialMin, this.#initialSec);
+    this.#timerStatus = Timer.status.stopped;
   }
 
   setTimerValues(min, sec) {
@@ -75,6 +89,10 @@ class Timer {
     return this.#seconds;
   }
 
+  getStatus() {
+    return this.#timerStatus;
+  }
+
   #countUp() {
     console.log('not implemented');
   }
@@ -99,4 +117,4 @@ class Timer {
   }
 }
 
-export { Timer, TIMER_COUNTDOWN, TIMER_COUNTUP };
+export { Timer };
