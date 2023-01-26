@@ -4,7 +4,9 @@ class Timer {
   #minutes;
   #seconds;
   #uiTime;
-  #timerTotal;
+  #countDownTime;
+  #countUpTime;
+  #totalTime;
   #timerId;
   #timerType;
   #timerStatus;
@@ -21,8 +23,7 @@ class Timer {
   });
 
   constructor(min, sec, type = Timer.types.countdown) {
-    this.setTimerValues(min, sec);
-    this.#timerType = type;
+    this.setTimerValues(min, sec, type);
   }
 
   start() {
@@ -56,7 +57,7 @@ class Timer {
     this.#timerStatus = Timer.status.stopped;
   }
 
-  setTimerValues(min, sec) {
+  setTimerValues(min, sec, type = Timer.types.countdown) {
     if (!(sec >= 0 && sec <= 59) || !Number.isInteger(sec)) {
       throw new Error(
         `Invalid parameter. Seconds should be a positive integer number between 0 and 59`
@@ -69,11 +70,21 @@ class Timer {
       );
     }
 
-    this.#minutes = min;
-    this.#seconds = sec;
+    this.#timerType = type;
+    this.#totalTime = min * 60 + sec;
+
+    if (this.#timerType === Timer.types.countUp) {
+      this.#minutes = 0;
+      this.#seconds = 0;
+      this.#countUpTime = 0;
+    } else {
+      this.#minutes = min;
+      this.#seconds = sec;
+      this.#countDownTime = this.#totalTime;
+    }
+
     this.#initialMin = this.#minutes;
     this.#initialSec = this.#seconds;
-    this.#timerTotal = this.#minutes * 60 + this.#seconds;
     this.#setUiTime();
   }
 
@@ -94,17 +105,21 @@ class Timer {
   }
 
   #countUp() {
-    console.log('not implemented');
+    this.#countUpTime++;
+    if (this.#countUpTime === this.#totalTime) this.pause();
+
+    this.#minutes = parseInt(this.#countUpTime / 60);
+    this.#seconds = parseInt(this.#countUpTime % 60);
+
+    this.#setUiTime();
   }
 
   #countDown() {
-    this.#timerTotal--;
-    if (this.#timerTotal <= 0) {
-      this.pause();
-    }
+    this.#countDownTime--;
+    if (this.#countDownTime <= 0) this.pause();
 
-    this.#minutes = parseInt(this.#timerTotal / 60);
-    this.#seconds = parseInt(this.#timerTotal % 60);
+    this.#minutes = parseInt(this.#countDownTime / 60);
+    this.#seconds = parseInt(this.#countDownTime % 60);
 
     this.#setUiTime();
   }
