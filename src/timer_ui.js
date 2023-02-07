@@ -102,7 +102,9 @@ class UiTimer {
   #setCurrentTimer(event) {
     this.#btnStartPause.removeEventListener('click', this.boundFnToStartTimer);
 
-    this.#stopTimerUi();
+    if (this.#timer.getStatus() === Timer.status.running) {
+      this.#stopTimerUi();
+    }
 
     if (event.target === this.#btnFocusTimer) {
       this.#timer.setTimerMinSec(25, 0);
