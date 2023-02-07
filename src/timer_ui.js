@@ -8,6 +8,8 @@ class UiTimer {
   #btnShortBreak;
   #btnLongBreak;
   #btnStartPause;
+  #boundFnToPauseTimer;
+  #boundFnToStartTimer;
   #mainEl;
   #color;
   #timer;
@@ -70,8 +72,8 @@ class UiTimer {
     this.#btnStartPause.className = 'btn';
     this.#btnStartPause.id = 'btn-start-pause';
     this.#btnStartPause.textContent = 'Start';
-    this.boundFnToStartTimer = this.#startTimerUi.bind(this);
-    this.#btnStartPause.addEventListener('click', this.boundFnToStartTimer);
+    this.#boundFnToStartTimer = this.#startTimerUi.bind(this);
+    this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
   }
 
   #setTimerText() {
@@ -100,7 +102,7 @@ class UiTimer {
   }
 
   #setCurrentTimer(event) {
-    this.#btnStartPause.removeEventListener('click', this.boundFnToStartTimer);
+    this.#btnStartPause.removeEventListener('click', this.#boundFnToStartTimer);
 
     if (this.#timer.getStatus() === Timer.status.running) {
       this.#stopTimerUi();
@@ -118,14 +120,14 @@ class UiTimer {
       this.#btnStartPause.textContent = 'Start';
     }
 
-    this.#btnStartPause.addEventListener('click', this.boundFnToStartTimer);
+    this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
     this.#setTimerText();
   }
 
   #startTimerUi() {
     console.log('start ui');
 
-    this.#btnStartPause.removeEventListener('click', this.boundFnToStartTimer);
+    this.#btnStartPause.removeEventListener('click', this.#boundFnToStartTimer);
 
     this.#timer.start();
     this.#btnStartPause.textContent = 'Pause';
@@ -137,8 +139,8 @@ class UiTimer {
       this.#timerTextEl.textContent = this.#timer.getUiTime();
     }, 1000);
 
-    this.boundFnToPauseTimer = this.#pauseTimer.bind(this);
-    this.#btnStartPause.addEventListener('click', this.boundFnToPauseTimer);
+    this.#boundFnToPauseTimer = this.#pauseTimer.bind(this);
+    this.#btnStartPause.addEventListener('click', this.#boundFnToPauseTimer);
   }
 
   #pauseTimer() {
@@ -146,8 +148,8 @@ class UiTimer {
     clearInterval(this.#timerId);
     this.#timer.pause();
     this.#btnStartPause.textContent = 'Start';
-    this.#btnStartPause.removeEventListener('click', this.boundFnToPauseTimer);
-    this.#btnStartPause.addEventListener('click', this.boundFnToStartTimer);
+    this.#btnStartPause.removeEventListener('click', this.#boundFnToPauseTimer);
+    this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
   }
 
   #stopTimerUi() {
