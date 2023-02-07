@@ -85,7 +85,7 @@ class UiTimer {
     this.#sectionTimerEl.style.backgroundColor = `var(--${
       this.#color
     }-accent-light)`;
-    this.#btnStartPause.style.backgroundColor = `var(--${this.#color}-accent)`;
+    this.#btnStartPause.style.color = `var(--${this.#color}-accent)`;
     if (event) {
       event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
     }
