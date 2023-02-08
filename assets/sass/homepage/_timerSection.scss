@@ -15,6 +15,8 @@ section {
   color: var(--white);
   border-radius: 5px;
   box-shadow: var(--box-shadow-black);
+  position: relative;
+  overflow: hidden;
 }
 
 .timer-type {
