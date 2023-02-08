@@ -1,4 +1,5 @@
 import { Timer } from './timer.js';
+import { ProgressBar } from './progress_bar.js';
 
 class UiTimer {
   #sectionTimerEl;
@@ -8,6 +9,7 @@ class UiTimer {
   #btnShortBreak;
   #btnLongBreak;
   #btnStartPause;
+  #progressBarTimer;
   #boundFnToPauseTimer;
   #boundFnToStartTimer;
   #mainEl;
@@ -32,6 +34,7 @@ class UiTimer {
     this.#sectionTimerEl.append(this.#timerTypesEl);
     this.#sectionTimerEl.append(this.#timerTextEl);
     this.#sectionTimerEl.append(this.#btnStartPause);
+    this.#sectionTimerEl.append(this.#progressBarTimer.getProgressBarElement());
 
     this.#updateUiColor(this.#color);
     this.#setTimerText();
@@ -74,6 +77,8 @@ class UiTimer {
     this.#btnStartPause.textContent = 'Start';
     this.#boundFnToStartTimer = this.#startTimerUi.bind(this);
     this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
+
+    this.#progressBarTimer = new ProgressBar();
   }
 
   #setTimerText() {
@@ -88,6 +93,7 @@ class UiTimer {
       this.#color
     }-accent-light)`;
     this.#btnStartPause.style.color = `var(--${this.#color}-accent)`;
+    this.#progressBarTimer.setDivBarColor(`var(--${this.#color}-accent)`);
     if (event) {
       event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
     }
@@ -120,6 +126,7 @@ class UiTimer {
       this.#btnStartPause.textContent = 'Start';
     }
 
+    this.#progressBarTimer.setProgress(0);
     this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
     this.#setTimerText();
   }
@@ -129,6 +136,8 @@ class UiTimer {
 
     this.#btnStartPause.removeEventListener('click', this.#boundFnToStartTimer);
 
+    let totalDuration =
+      this.#timer.getMinutes() * 60 + this.#timer.getSeconds();
     this.#timer.start();
     this.#btnStartPause.textContent = 'Pause';
 
@@ -136,6 +145,13 @@ class UiTimer {
       if (this.#timer.getUiTime() === '00:00') {
         clearInterval(this.#timerId);
       }
+      let currentTime =
+        this.#timer.getMinutes() * 60 + this.#timer.getSeconds();
+      let progressPercentage = (
+        100 -
+        (currentTime / totalDuration) * 100
+      ).toFixed(2);
+      this.#progressBarTimer.setProgress(progressPercentage);
       this.#timerTextEl.textContent = this.#timer.getUiTime();
     }, 1000);
 
@@ -156,6 +172,7 @@ class UiTimer {
     console.log('stop ui');
     clearInterval(this.#timerId);
     this.#timer.stop();
+    this.#progressBarTimer.setProgress(0);
     this.#setTimerText();
   }
 }
