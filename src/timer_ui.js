@@ -34,7 +34,7 @@ class UiTimer {
     this.#sectionTimerEl.append(this.#timerTypesEl);
     this.#sectionTimerEl.append(this.#timerTextEl);
     this.#sectionTimerEl.append(this.#btnStartPause);
-    this.#sectionTimerEl.append(this.#progressBarTimer.getProgressBarElement());
+    this.#sectionTimerEl.append(this.#progressBarTimer.getElement());
 
     this.#updateUiColor(this.#color);
     this.#setTimerText();
@@ -93,7 +93,7 @@ class UiTimer {
       this.#color
     }-accent-light)`;
     this.#btnStartPause.style.color = `var(--${this.#color}-accent)`;
-    this.#progressBarTimer.setDivBarColor(`var(--${this.#color}-accent)`);
+    this.#progressBarTimer.setBackgroundColor(`var(--${this.#color}-accent)`);
     if (event) {
       event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
     }

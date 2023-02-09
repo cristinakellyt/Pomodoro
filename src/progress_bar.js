@@ -1,7 +1,6 @@
 class ProgressBar {
   #progressBarDiv;
   #progressBarFill;
-  #percentage;
 
   constructor() {
     this.#createElement();
@@ -15,21 +14,24 @@ class ProgressBar {
     this.#progressBarDiv.appendChild(this.#progressBarFill);
   }
 
-  getProgressBarElement() {
+  getElement() {
     return this.#progressBarDiv;
   }
 
+  getPercentage() {
+    return +this.#progressBarFill.style.width.slice(0, -1);
+  }
+
   setProgress(percentage) {
-    console.log('update progress bar');
-    this.#percentage = percentage;
-    this.#progressBarFill.style.width = `${this.#percentage}%`;
+    if (percentage < 0 || percentage > 100) {
+      throw new Error(
+        `Invalid parameter. Percentage must be a number between 0 and 100`
+      );
+    }
+    this.#progressBarFill.style.width = `${percentage}%`;
   }
 
-  getProgress(percentage) {
-    return `${this.#percentage}%`;
-  }
-
-  setDivBarColor(color) {
+  setBackgroundColor(color) {
     this.#progressBarDiv.style.backgroundColor = color;
   }
 
