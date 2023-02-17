@@ -45,9 +45,9 @@ class UiTimer {
   }
 
   #addTimerBtnEvents(btn) {
-    btn.addEventListener('mouseover', this.#mouseHoverColor.bind(this));
-    btn.addEventListener('mouseleave', this.#mouseLeaveColor.bind(this));
-    btn.addEventListener('click', this.#checkTimerStatus.bind(this));
+    btn.addEventListener('mouseover', this.#mouseHoverColorHandler.bind(this));
+    btn.addEventListener('mouseleave', this.#mouseLeaveColorHandler.bind(this));
+    btn.addEventListener('click', this.#checkTimerStatusHandler.bind(this));
   }
 
   #createUIElements() {
@@ -79,7 +79,7 @@ class UiTimer {
     this.#btnStartPause.className = 'btn';
     this.#btnStartPause.id = 'btn-start-pause';
     this.#btnStartPause.textContent = 'Start';
-    this.#boundFnToStartTimer = this.#startTimerUi.bind(this);
+    this.#boundFnToStartTimer = this.#start.bind(this);
     this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
 
     this.#progressBarTimer = new ProgressBar();
@@ -100,15 +100,15 @@ class UiTimer {
     this.#modal.appendTo(this.#mainEl);
   }
 
-  #mouseHoverColor(event) {
+  #mouseHoverColorHandler(event) {
     event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
   }
 
-  #mouseLeaveColor(event) {
+  #mouseLeaveColorHandler(event) {
     event.target.style.backgroundColor = 'transparent';
   }
 
-  #checkTimerStatus(event) {
+  #checkTimerStatusHandler(event) {
     if (this.#currentBtn === event.target) return;
     if (
       this.#timer.getStatus() === Timer.status.running ||
@@ -182,17 +182,17 @@ class UiTimer {
 
   #confirmModalHandler(event) {
     this.#modal.hide();
-    this.#stopTimerUi();
+    this.#stop();
     this.#setCurrentTimeAndColor(event);
-    this.#mouseLeaveColor(event);
+    this.#mouseLeaveColorHandler(event);
   }
 
   #cancelModalHandler() {
     this.#modal.hide();
-    this.#startTimerUi();
+    this.#start();
   }
 
-  #startTimerUi() {
+  #start() {
     console.log('start ui');
 
     this.#btnStartPause.removeEventListener('click', this.#boundFnToStartTimer);
@@ -215,11 +215,11 @@ class UiTimer {
       this.#timerTextEl.textContent = this.#timer.getUiTime();
     }, 1000);
 
-    this.#boundFnToPauseTimer = this.#pauseTimer.bind(this);
+    this.#boundFnToPauseTimer = this.#pause.bind(this);
     this.#btnStartPause.addEventListener('click', this.#boundFnToPauseTimer);
   }
 
-  #pauseTimer() {
+  #pause() {
     console.log('pause ui');
     clearInterval(this.#timerId);
     this.#timer.pause();
@@ -228,7 +228,7 @@ class UiTimer {
     this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
   }
 
-  #stopTimerUi() {
+  #stop() {
     console.log('stop ui');
     clearInterval(this.#timerId);
     this.#timer.stop();
