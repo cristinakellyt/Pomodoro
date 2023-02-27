@@ -11,6 +11,7 @@ class Timer {
     running: 'running',
     paused: 'paused',
     stopped: 'stopped',
+    finished: 'finished',
   });
 
   static types = Object.freeze({
@@ -30,10 +31,15 @@ class Timer {
 
   start() {
     this.#timerId = setInterval(() => {
+      this.#timerStatus = Timer.status.running;
       this.#update();
+      if (this.#counter === this.#finalTime) {
+        this.pause();
+        this.#timerStatus = Timer.status.finished;
+        return;
+      }
       console.log('callback', this.#uiTime);
     }, 1000);
-    this.#timerStatus = Timer.status.running;
     console.log('start');
   }
 
@@ -53,7 +59,7 @@ class Timer {
     console.log('stop');
     clearInterval(this.#timerId);
     this.#counter = this.#initialTime;
-    this.setTimerMinSec(this.getMinutes(), this.getSeconds());
+    this.#setUiTime();
     this.#timerStatus = Timer.status.stopped;
   }
 
@@ -102,15 +108,20 @@ class Timer {
     return this.#timerStatus;
   }
 
+  getTotalTime() {
+    if (this.#timerType === Timer.types.countUp) {
+      return this.#finalTime;
+    } else if (this.#timerType === Timer.types.countDown) {
+      return this.#initialTime;
+    }
+  }
+
   #update() {
     if (this.#timerType === Timer.types.countDown) {
       this.#counter--;
     } else {
       this.#counter++;
     }
-
-    if (this.#counter === this.#finalTime) this.pause();
-
     this.#setUiTime();
   }
 
