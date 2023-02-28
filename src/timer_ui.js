@@ -19,6 +19,7 @@ class UiTimer {
   #timer;
   #timerId;
   #modal;
+  #boundFnConfirmModalHandler;
 
   constructor(main, color) {
     this.#mainEl = main;
@@ -114,9 +115,13 @@ class UiTimer {
       this.#timer.getStatus() === Timer.status.running ||
       this.#timer.getStatus() === Timer.status.paused
     ) {
+      this.#boundFnConfirmModalHandler = this.#confirmModalHandler.bind(
+        this,
+        event
+      );
       this.#mainEl.addEventListener(
         'confirm',
-        this.#confirmModalHandler.bind(this, event)
+        this.#boundFnConfirmModalHandler
       );
 
       this.#mainEl.addEventListener('cancel', this.#cancelModalHandler);
@@ -182,12 +187,20 @@ class UiTimer {
   }
 
   #confirmModalHandler(event) {
+    this.#mainEl.removeEventListener(
+      'confirm',
+      this.#boundFnConfirmModalHandler
+    );
     this.#stop();
     this.#setCurrentTimeAndColor(event);
     this.#mouseLeaveColorHandler(event);
   }
 
   #cancelModalHandler = () => {
+    this.#mainEl.removeEventListener(
+      'confirm',
+      this.#boundFnConfirmModalHandler
+    );
     this.#mainEl.removeEventListener('cancel', this.#cancelModalHandler);
     this.#start();
   };
