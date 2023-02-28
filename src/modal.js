@@ -29,13 +29,13 @@ class Modal {
     this.#confirmBtnEl.className = 'btn';
     this.#confirmBtnEl.textContent = confirmBtnText;
     this.#confirmBtnEl.style.backgroundColor = colorLight;
-    this.#confirmBtnEl.addEventListener('click', this.confirm.bind(this));
+    this.#confirmBtnEl.addEventListener('click', this.#confirm);
 
     this.#cancelBtnEl = document.createElement('button');
     this.#cancelBtnEl.className = 'btn';
     this.#cancelBtnEl.textContent = cancelBtnText;
     this.#cancelBtnEl.style.backgroundColor = colorDark;
-    this.#cancelBtnEl.addEventListener('click', this.cancel.bind(this));
+    this.#cancelBtnEl.addEventListener('click', this.#cancel);
 
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'modal-box__btns';
@@ -48,23 +48,23 @@ class Modal {
     this.#mainDiv.appendChild(this.#contentBox);
   }
 
-  confirm(event) {
+  #confirm = (event) => {
     this.#hide();
     const confirmEvent = new Event('confirm', {
       bubbles: true,
       composed: true,
     });
     event.target.dispatchEvent(confirmEvent);
-  }
+  };
 
-  cancel(event) {
+  #cancel = (event) => {
     this.#hide();
     const cancelEvent = new Event('cancel', {
       bubbles: true,
       composed: true,
     });
     event.target.dispatchEvent(cancelEvent);
-  }
+  };
 
   appendTo(element) {
     if (!(element instanceof HTMLElement))
