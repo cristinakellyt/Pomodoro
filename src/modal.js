@@ -3,7 +3,6 @@ class Modal {
   #contentBox;
   #confirmBtnEl;
   #cancelBtnEl;
-  #cancelCallback;
 
   constructor({
     title = 'Title',
@@ -36,6 +35,7 @@ class Modal {
     this.#cancelBtnEl.className = 'btn';
     this.#cancelBtnEl.textContent = cancelBtnText;
     this.#cancelBtnEl.style.backgroundColor = colorDark;
+    this.#cancelBtnEl.addEventListener('click', this.cancel.bind(this));
 
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'modal-box__btns';
@@ -57,13 +57,13 @@ class Modal {
     event.target.dispatchEvent(confirmEvent);
   }
 
-  onCancel(callback) {
-    if (typeof callback !== 'function')
-      throw new TypeError('callback is not a function');
-
-    this.#cancelBtnEl.removeEventListener('click', this.#cancelCallback);
-    this.#cancelCallback = callback;
-    this.#cancelBtnEl.addEventListener('click', this.#cancelCallback);
+  cancel(event) {
+    this.#hide();
+    const cancelEvent = new Event('cancel', {
+      bubbles: true,
+      composed: true,
+    });
+    event.target.dispatchEvent(cancelEvent);
   }
 
   appendTo(element) {

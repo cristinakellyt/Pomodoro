@@ -118,7 +118,8 @@ class UiTimer {
         'confirm',
         this.#confirmModalHandler.bind(this, event)
       );
-      this.#modal.onCancel(this.#cancelModalHandler.bind(this));
+
+      this.#mainEl.addEventListener('cancel', this.#cancelModalHandler);
       this.#btnStartPause.removeEventListener(
         'click',
         this.#boundFnToPauseTimer
@@ -186,10 +187,10 @@ class UiTimer {
     this.#mouseLeaveColorHandler(event);
   }
 
-  #cancelModalHandler() {
-    this.#modal.hide();
+  #cancelModalHandler = () => {
+    this.#mainEl.removeEventListener('cancel', this.#cancelModalHandler);
     this.#start();
-  }
+  };
 
   #start() {
     console.log('start ui');
