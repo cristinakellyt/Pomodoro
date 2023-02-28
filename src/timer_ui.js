@@ -114,7 +114,10 @@ class UiTimer {
       this.#timer.getStatus() === Timer.status.running ||
       this.#timer.getStatus() === Timer.status.paused
     ) {
-      this.#modal.onConfirm(this.#confirmModalHandler.bind(this, event));
+      this.#mainEl.addEventListener(
+        'confirm',
+        this.#confirmModalHandler.bind(this, event)
+      );
       this.#modal.onCancel(this.#cancelModalHandler.bind(this));
       this.#btnStartPause.removeEventListener(
         'click',
@@ -178,7 +181,6 @@ class UiTimer {
   }
 
   #confirmModalHandler(event) {
-    this.#modal.hide();
     this.#stop();
     this.#setCurrentTimeAndColor(event);
     this.#mouseLeaveColorHandler(event);
