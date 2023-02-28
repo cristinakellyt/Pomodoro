@@ -88,8 +88,8 @@ class UiTimer {
       title: 'There is a timer running!',
       subtitle:
         'The timer will stop if you continue. Are you sure you want to leave?',
-      colorLight: `var(--${this.#color}-light)`,
-      colorDark: `var(--${this.#color}-accent-light)`,
+      colorLight: `var(--${this.#color}-very-light)`,
+      colorDark: `var(--${this.#color}-light)`,
       confirmBtnText: 'Yes',
       cancelBtnText: 'No',
     };
@@ -99,7 +99,7 @@ class UiTimer {
   }
 
   #mouseHoverColorHandler = (event) => {
-    event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
+    event.target.style.backgroundColor = `var(--${this.#color}-dark)`;
   };
 
   #mouseLeaveColorHandler = (event) => {
@@ -127,9 +127,9 @@ class UiTimer {
       this.#modal.show();
       clearInterval(this.#timerId);
       this.#timer.pause();
-      this.#modal.borderColor = `var(--${this.#color}-accent-light)`;
-      this.#modal.confirmBtnColor = `var(--${this.#color}-light)`;
-      this.#modal.cancelBtnColor = `var(--${this.#color}-accent-light)`;
+      this.#modal.borderColor = `var(--${this.#color}-light)`;
+      this.#modal.confirmBtnColor = `var(--${this.#color}-very-light)`;
+      this.#modal.cancelBtnColor = `var(--${this.#color}-light)`;
       return;
     }
 
@@ -137,14 +137,12 @@ class UiTimer {
   };
 
   #updateUiColor(event) {
-    this.#mainEl.style.backgroundColor = `var(--${this.#color}-light)`;
-    this.#sectionTimerEl.style.backgroundColor = `var(--${
-      this.#color
-    }-accent-light)`;
-    this.#btnStartPause.style.color = `var(--${this.#color}-accent)`;
-    this.#progressBarTimer.setBackgroundColor(`var(--${this.#color}-accent)`);
+    this.#mainEl.style.backgroundColor = `var(--${this.#color}-very-light)`;
+    this.#sectionTimerEl.style.backgroundColor = `var(--${this.#color}-light)`;
+    this.#btnStartPause.style.color = `var(--${this.#color}-dark)`;
+    this.#progressBarTimer.setBackgroundColor(`var(--${this.#color}-dark)`);
     if (event) {
-      event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
+      event.target.style.backgroundColor = `var(--${this.#color}-dark)`;
     }
   }
 
