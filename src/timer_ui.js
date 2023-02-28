@@ -4,7 +4,6 @@ import { Modal } from './modal.js';
 
 class UiTimer {
   #sectionTimerEl;
-  #timerTypesEl;
   #timerTextEl;
   #btnFocusTimer;
   #btnShortBreak;
@@ -22,37 +21,15 @@ class UiTimer {
   constructor(main, color) {
     this.#mainEl = main;
     this.#color = color;
-
     this.#timer = new Timer(25, 0, Timer.types.countDown);
-    this.#createUIElements();
+    this.#createTimerElement();
   }
 
-  render() {
-    this.#timerTypesEl.appendChild(this.#btnFocusTimer);
-    this.#timerTypesEl.appendChild(this.#btnShortBreak);
-    this.#timerTypesEl.appendChild(this.#btnLongBreak);
-
-    this.#mainEl.append(this.#sectionTimerEl);
-    this.#sectionTimerEl.append(this.#timerTypesEl);
-    this.#sectionTimerEl.append(this.#timerTextEl);
-    this.#sectionTimerEl.append(this.#btnStartPause);
-    this.#sectionTimerEl.append(this.#progressBarTimer.getElement());
-
-    this.#updateUiColor();
-    this.#setTimerText();
-  }
-
-  #addTimerBtnEvents(btn) {
-    btn.addEventListener('mouseover', this.#mouseHoverColorHandler);
-    btn.addEventListener('mouseleave', this.#mouseLeaveColorHandler);
-    btn.addEventListener('click', this.#checkTimerStatusHandler);
-  }
-
-  #createUIElements() {
+  #createTimerElement() {
     this.#sectionTimerEl = document.createElement('section');
 
-    this.#timerTypesEl = document.createElement('div');
-    this.#timerTypesEl.className = 'timer-type';
+    const timerTypesEl = document.createElement('div');
+    timerTypesEl.className = 'timer-type';
 
     this.#btnFocusTimer = document.createElement('h2');
     this.#btnFocusTimer.id = 'focus-timer';
@@ -79,8 +56,26 @@ class UiTimer {
     this.#btnStartPause.textContent = 'Start';
     this.#btnStartPause.addEventListener('click', this.#startHandler);
 
-    this.#createModal();
     this.#progressBarTimer = new ProgressBar();
+
+    timerTypesEl.appendChild(this.#btnFocusTimer);
+    timerTypesEl.appendChild(this.#btnShortBreak);
+    timerTypesEl.appendChild(this.#btnLongBreak);
+    this.#sectionTimerEl.appendChild(timerTypesEl);
+    this.#sectionTimerEl.appendChild(this.#timerTextEl);
+    this.#sectionTimerEl.appendChild(this.#btnStartPause);
+    this.#sectionTimerEl.appendChild(this.#progressBarTimer.getElement());
+    this.#mainEl.appendChild(this.#sectionTimerEl);
+
+    this.#updateUiColor();
+    this.#setTimerText();
+    this.#createModal();
+  }
+
+  #addTimerBtnEvents(btn) {
+    btn.addEventListener('mouseover', this.#mouseHoverColorHandler);
+    btn.addEventListener('mouseleave', this.#mouseLeaveColorHandler);
+    btn.addEventListener('click', this.#checkTimerStatusHandler);
   }
 
   #createModal() {
@@ -243,7 +238,7 @@ class UiTimer {
     console.log('pause ui');
     clearInterval(this.#timerId);
     this.#timer.pause();
-    this.#btnStartPause.textContent = 'Start';
+    this.#btnStartPause.textContent = 'Resume';
     this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
     this.#btnStartPause.addEventListener('click', this.#startHandler);
   };
