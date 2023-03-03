@@ -64,7 +64,7 @@ class UiTimer {
     this.#sectionTimerEl.appendChild(timerTypesEl);
     this.#sectionTimerEl.appendChild(this.#timerTextEl);
     this.#sectionTimerEl.appendChild(this.#btnStartPause);
-    this.#sectionTimerEl.appendChild(this.#progressBarTimer.getElement());
+    this.#sectionTimerEl.appendChild(this.#progressBarTimer.element);
     this.#mainEl.appendChild(this.#sectionTimerEl);
 
     this.#updateUiColor();
@@ -109,8 +109,8 @@ class UiTimer {
     this.#lastBtnClicked = event.target;
 
     if (
-      this.#timer.getStatus() === Timer.status.running ||
-      this.#timer.getStatus() === Timer.status.paused
+      this.#timer.status === Timer.status.running ||
+      this.#timer.status === Timer.status.paused
     ) {
       this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
       clearInterval(this.#timerId);
@@ -131,7 +131,7 @@ class UiTimer {
     this.#mainEl.style.backgroundColor = `var(--${this.#color}-very-light)`;
     this.#sectionTimerEl.style.backgroundColor = `var(--${this.#color}-light)`;
     this.#btnStartPause.style.color = `var(--${this.#color}-dark)`;
-    this.#progressBarTimer.setBackgroundColor(`var(--${this.#color}-dark)`);
+    this.#progressBarTimer.backgroundColor = `var(--${this.#color}-dark)`;
     if (event) {
       this.#lastBtnClicked.style.backgroundColor = `var(--${this.#color}-dark)`;
     }
@@ -155,14 +155,14 @@ class UiTimer {
       this.#btnStartPause.textContent = 'Start';
     }
 
-    this.#progressBarTimer.setProgress(0);
+    this.#progressBarTimer.progress = 0;
 
     this.#btnStartPause.addEventListener('click', this.#startHandler);
     this.#setTimerText();
   }
 
   #setTimerText() {
-    this.#timerTextEl.textContent = this.#timer.getUiTime();
+    this.#timerTextEl.textContent = this.#timer.uiTime;
   }
 
   #confirmModalHandler = () => {
@@ -181,10 +181,10 @@ class UiTimer {
 
     this.#btnStartPause.removeEventListener('click', this.#startHandler);
 
-    let totalDuration = this.#timer.getTotalTime();
+    let totalDuration = this.#timer.totalTime;
 
     if (this.#btnStartPause.textContent === 'Restart') {
-      this.#progressBarTimer.setProgress(0);
+      this.#progressBarTimer.progress = 0;
       this.#timer.restart();
       this.#setTimerText();
     } else {
@@ -193,13 +193,13 @@ class UiTimer {
     this.#btnStartPause.textContent = 'Pause';
 
     this.#timerId = setInterval(() => {
-      if (this.#timer.getUiTime() === '00:00') {
+      if (this.#timer.uiTime === '00:00') {
         clearInterval(this.#timerId);
         this.#setTimerText();
         this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
         this.#btnStartPause.textContent = 'Restart';
         this.#btnStartPause.addEventListener('click', this.#startHandler);
-        this.#progressBarTimer.setProgress(100);
+        this.#progressBarTimer.progress = 100;
         return;
       }
       this.#setTimerText();
@@ -210,12 +210,12 @@ class UiTimer {
   };
 
   #updateProgressBar(totalDuration) {
-    let currentTime = this.#timer.getMinutes() * 60 + this.#timer.getSeconds();
+    let currentTime = this.#timer.minutes * 60 + this.#timer.seconds;
     let progressPercentage = (
       100 -
       (currentTime / totalDuration) * 100
     ).toFixed(2);
-    this.#progressBarTimer.setProgress(progressPercentage);
+    this.#progressBarTimer.progress = progressPercentage;
   }
 
   #pauseHandler = () => {
@@ -231,7 +231,7 @@ class UiTimer {
     console.log('stop ui');
     clearInterval(this.#timerId);
     this.#timer.stop();
-    this.#progressBarTimer.setProgress(0);
+    this.#progressBarTimer.progress = 0;
     this.#setTimerText();
   }
 }
