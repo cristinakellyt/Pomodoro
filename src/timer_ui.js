@@ -9,14 +9,14 @@ class UiTimer {
   #btnShortBreak;
   #btnLongBreak;
   #btnStartPause;
-  #currentBtn;
+  #selectedBtn;
+  #lastBtnClicked;
   #progressBarTimer;
   #mainEl;
   #color;
   #timer;
   #timerId;
   #modal;
-  #boundFnConfirmModalHandler;
 
   constructor(main, color) {
     this.#mainEl = main;
@@ -35,7 +35,7 @@ class UiTimer {
     this.#btnFocusTimer.id = 'focus-timer';
     this.#btnFocusTimer.textContent = 'Focus Time';
     this.#addTimerBtnEvents(this.#btnFocusTimer);
-    this.#currentBtn = this.#btnFocusTimer;
+    this.#selectedBtn = this.#btnFocusTimer;
 
     this.#btnShortBreak = document.createElement('h2');
     this.#btnShortBreak.id = 'short-break';
@@ -91,6 +91,9 @@ class UiTimer {
 
     this.#modal = new Modal(modalContent);
     this.#modal.appendTo(this.#mainEl);
+
+    this.#mainEl.addEventListener('confirm', this.#confirmModalHandler);
+    this.#mainEl.addEventListener('cancel', this.#cancelModalHandler);
   }
 
   #mouseHoverColorHandler = (event) => {
@@ -102,62 +105,51 @@ class UiTimer {
   };
 
   #checkTimerStatusHandler = (event) => {
-    if (this.#currentBtn === event.target) return;
+    if (this.#selectedBtn === event.target) return;
+    this.#lastBtnClicked = event.target;
+
     if (
       this.#timer.getStatus() === Timer.status.running ||
       this.#timer.getStatus() === Timer.status.paused
     ) {
-      this.#boundFnConfirmModalHandler = this.#confirmModalHandler.bind(
-        this,
-        event
-      );
-      this.#mainEl.addEventListener(
-        'confirm',
-        this.#boundFnConfirmModalHandler
-      );
-
-      this.#mainEl.addEventListener('cancel', this.#cancelModalHandler);
       this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
-
-      this.#modal.show();
       clearInterval(this.#timerId);
       this.#timer.pause();
       this.#modal.borderColor = `var(--${this.#color}-light)`;
       this.#modal.confirmBtnColor = `var(--${this.#color}-very-light)`;
       this.#modal.cancelBtnColor = `var(--${this.#color}-light)`;
+      this.#modal.show();
       return;
     }
 
-    this.#setCurrentTimeAndColor(event);
+    this.#selectedBtn = this.#lastBtnClicked;
+    this.#setCurrentTimeAndColor();
+    this.#updateUiColor(event);
   };
 
-  #updateUiColor(event) {
+  #updateUiColor = (event) => {
     this.#mainEl.style.backgroundColor = `var(--${this.#color}-very-light)`;
     this.#sectionTimerEl.style.backgroundColor = `var(--${this.#color}-light)`;
     this.#btnStartPause.style.color = `var(--${this.#color}-dark)`;
     this.#progressBarTimer.setBackgroundColor(`var(--${this.#color}-dark)`);
     if (event) {
-      event.target.style.backgroundColor = `var(--${this.#color}-dark)`;
+      this.#lastBtnClicked.style.backgroundColor = `var(--${this.#color}-dark)`;
     }
-  }
+  };
 
-  #setCurrentTimeAndColor(event) {
+  #setCurrentTimeAndColor() {
     this.#btnStartPause.removeEventListener('click', this.#startHandler);
 
-    if (event.target === this.#btnFocusTimer) {
+    if (this.#selectedBtn === this.#btnFocusTimer) {
       this.#timer.setTimerMinSec(25, 0);
       this.#color = 'red';
-    } else if (event.target === this.#btnShortBreak) {
+    } else if (this.#selectedBtn === this.#btnShortBreak) {
       this.#timer.setTimerMinSec(0, 5);
       this.#color = 'teal';
-    } else {
+    } else if (this.#selectedBtn === this.#btnLongBreak) {
       this.#timer.setTimerMinSec(10, 0);
       this.#color = 'indigo';
     }
-
-    this.#currentBtn = event.target;
-
-    this.#updateUiColor(event);
 
     if (this.#btnStartPause.textContent !== 'Start') {
       this.#btnStartPause.textContent = 'Start';
@@ -173,22 +165,14 @@ class UiTimer {
     this.#timerTextEl.textContent = this.#timer.getUiTime();
   }
 
-  #confirmModalHandler(event) {
-    this.#mainEl.removeEventListener(
-      'confirm',
-      this.#boundFnConfirmModalHandler
-    );
+  #confirmModalHandler = () => {
     this.#stop();
-    this.#setCurrentTimeAndColor(event);
-    this.#mouseLeaveColorHandler(event);
-  }
+    this.#selectedBtn = this.#lastBtnClicked;
+    this.#setCurrentTimeAndColor();
+    this.#updateUiColor();
+  };
 
   #cancelModalHandler = () => {
-    this.#mainEl.removeEventListener(
-      'confirm',
-      this.#boundFnConfirmModalHandler
-    );
-    this.#mainEl.removeEventListener('cancel', this.#cancelModalHandler);
     this.#startHandler();
   };
 
