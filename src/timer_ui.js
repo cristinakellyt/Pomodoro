@@ -36,6 +36,7 @@ class UiTimer {
     this.#btnFocusTimer.textContent = 'Focus Time';
     this.#addTimerBtnEvents(this.#btnFocusTimer);
     this.#selectedBtn = this.#btnFocusTimer;
+    this.#lastBtnClicked = this.#btnFocusTimer;
 
     this.#btnShortBreak = document.createElement('h2');
     this.#btnShortBreak.id = 'short-break';
@@ -68,6 +69,7 @@ class UiTimer {
     this.#mainEl.appendChild(this.#sectionTimerEl);
 
     this.#updateUiColor();
+    this.#lastBtnClicked.dispatchEvent(new Event('mouseleave'));
     this.#setTimerText();
     this.#createModal();
   }
@@ -124,17 +126,15 @@ class UiTimer {
 
     this.#selectedBtn = this.#lastBtnClicked;
     this.#setCurrentTimeAndColor();
-    this.#updateUiColor(event);
+    this.#updateUiColor();
   };
 
-  #updateUiColor = (event) => {
+  #updateUiColor = () => {
     this.#mainEl.style.backgroundColor = `var(--${this.#color}-very-light)`;
     this.#sectionTimerEl.style.backgroundColor = `var(--${this.#color}-light)`;
     this.#btnStartPause.style.color = `var(--${this.#color}-dark)`;
     this.#progressBarTimer.backgroundColor = `var(--${this.#color}-dark)`;
-    if (event) {
-      this.#lastBtnClicked.style.backgroundColor = `var(--${this.#color}-dark)`;
-    }
+    this.#lastBtnClicked.style.backgroundColor = `var(--${this.#color}-dark)`;
   };
 
   #setCurrentTimeAndColor() {
@@ -170,6 +170,7 @@ class UiTimer {
     this.#selectedBtn = this.#lastBtnClicked;
     this.#setCurrentTimeAndColor();
     this.#updateUiColor();
+    this.#lastBtnClicked.dispatchEvent(new Event('mouseleave'));
   };
 
   #cancelModalHandler = () => {
