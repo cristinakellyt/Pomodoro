@@ -4,16 +4,14 @@ import { Modal } from './modal.js';
 
 class UiTimer {
   #sectionTimerEl;
-  #timerTypesEl;
   #timerTextEl;
   #btnFocusTimer;
   #btnShortBreak;
   #btnLongBreak;
   #btnStartPause;
-  #currentBtn;
+  #selectedBtn;
+  #lastBtnClicked;
   #progressBarTimer;
-  #boundFnToPauseTimer;
-  #boundFnToStartTimer;
   #mainEl;
   #color;
   #timer;
@@ -23,43 +21,22 @@ class UiTimer {
   constructor(main, color) {
     this.#mainEl = main;
     this.#color = color;
-
     this.#timer = new Timer(25, 0, Timer.types.countDown);
-    this.#createUIElements();
+    this.#createTimerElement();
   }
 
-  render() {
-    this.#timerTypesEl.appendChild(this.#btnFocusTimer);
-    this.#timerTypesEl.appendChild(this.#btnShortBreak);
-    this.#timerTypesEl.appendChild(this.#btnLongBreak);
-
-    this.#mainEl.append(this.#sectionTimerEl);
-    this.#sectionTimerEl.append(this.#timerTypesEl);
-    this.#sectionTimerEl.append(this.#timerTextEl);
-    this.#sectionTimerEl.append(this.#btnStartPause);
-    this.#sectionTimerEl.append(this.#progressBarTimer.getElement());
-
-    this.#updateUiColor();
-    this.#setTimerText();
-  }
-
-  #addTimerBtnEvents(btn) {
-    btn.addEventListener('mouseover', this.#mouseHoverColorHandler.bind(this));
-    btn.addEventListener('mouseleave', this.#mouseLeaveColorHandler.bind(this));
-    btn.addEventListener('click', this.#checkTimerStatusHandler.bind(this));
-  }
-
-  #createUIElements() {
+  #createTimerElement() {
     this.#sectionTimerEl = document.createElement('section');
 
-    this.#timerTypesEl = document.createElement('div');
-    this.#timerTypesEl.className = 'timer-type';
+    const timerTypesEl = document.createElement('div');
+    timerTypesEl.className = 'timer-type';
 
     this.#btnFocusTimer = document.createElement('h2');
     this.#btnFocusTimer.id = 'focus-timer';
     this.#btnFocusTimer.textContent = 'Focus Time';
     this.#addTimerBtnEvents(this.#btnFocusTimer);
-    this.#currentBtn = this.#btnFocusTimer;
+    this.#selectedBtn = this.#btnFocusTimer;
+    this.#lastBtnClicked = this.#btnFocusTimer;
 
     this.#btnShortBreak = document.createElement('h2');
     this.#btnShortBreak.id = 'short-break';
@@ -78,11 +55,29 @@ class UiTimer {
     this.#btnStartPause.className = 'btn';
     this.#btnStartPause.id = 'btn-start-pause';
     this.#btnStartPause.textContent = 'Start';
-    this.#boundFnToStartTimer = this.#start.bind(this);
-    this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
+    this.#btnStartPause.addEventListener('click', this.#startHandler);
 
-    this.#createModal();
     this.#progressBarTimer = new ProgressBar();
+
+    timerTypesEl.appendChild(this.#btnFocusTimer);
+    timerTypesEl.appendChild(this.#btnShortBreak);
+    timerTypesEl.appendChild(this.#btnLongBreak);
+    this.#sectionTimerEl.appendChild(timerTypesEl);
+    this.#sectionTimerEl.appendChild(this.#timerTextEl);
+    this.#sectionTimerEl.appendChild(this.#btnStartPause);
+    this.#sectionTimerEl.appendChild(this.#progressBarTimer.element);
+    this.#mainEl.appendChild(this.#sectionTimerEl);
+
+    this.#updateUiColor();
+    this.#lastBtnClicked.dispatchEvent(new Event('mouseleave'));
+    this.#setTimerText();
+    this.#createModal();
+  }
+
+  #addTimerBtnEvents(btn) {
+    btn.addEventListener('mouseover', this.#mouseHoverColorHandler);
+    btn.addEventListener('mouseleave', this.#mouseLeaveColorHandler);
+    btn.addEventListener('click', this.#checkTimerStatusHandler);
   }
 
   #createModal() {
@@ -90,114 +85,107 @@ class UiTimer {
       title: 'There is a timer running!',
       subtitle:
         'The timer will stop if you continue. Are you sure you want to leave?',
-      colorLight: `var(--${this.#color}-light)`,
-      colorDark: `var(--${this.#color}-accent-light)`,
+      colorLight: `var(--${this.#color}-very-light)`,
+      colorDark: `var(--${this.#color}-light)`,
       confirmBtnText: 'Yes',
       cancelBtnText: 'No',
     };
 
     this.#modal = new Modal(modalContent);
     this.#modal.appendTo(this.#mainEl);
+
+    this.#mainEl.addEventListener('confirm', this.#confirmModalHandler);
+    this.#mainEl.addEventListener('cancel', this.#cancelModalHandler);
   }
 
-  #mouseHoverColorHandler(event) {
-    event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
-  }
+  #mouseHoverColorHandler = (event) => {
+    event.target.style.backgroundColor = `var(--${this.#color}-dark)`;
+  };
 
-  #mouseLeaveColorHandler(event) {
+  #mouseLeaveColorHandler = (event) => {
     event.target.style.backgroundColor = 'transparent';
-  }
+  };
 
-  #checkTimerStatusHandler(event) {
-    if (this.#currentBtn === event.target) return;
+  #checkTimerStatusHandler = (event) => {
+    if (this.#selectedBtn === event.target) return;
+    this.#lastBtnClicked = event.target;
+
     if (
-      this.#timer.getStatus() === Timer.status.running ||
-      this.#timer.getStatus() === Timer.status.paused
+      this.#timer.status === Timer.status.running ||
+      this.#timer.status === Timer.status.paused
     ) {
-      this.#modal.onConfirm(this.#confirmModalHandler.bind(this, event));
-      this.#modal.onCancel(this.#cancelModalHandler.bind(this));
-      this.#btnStartPause.removeEventListener(
-        'click',
-        this.#boundFnToPauseTimer
-      );
-
-      this.#modal.show();
+      this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
       clearInterval(this.#timerId);
       this.#timer.pause();
-      this.#modal.borderColor = `var(--${this.#color}-accent-light)`;
-      this.#modal.confirmBtnColor = `var(--${this.#color}-light)`;
-      this.#modal.cancelBtnColor = `var(--${this.#color}-accent-light)`;
+      this.#modal.borderColor = `var(--${this.#color}-light)`;
+      this.#modal.confirmBtnColor = `var(--${this.#color}-very-light)`;
+      this.#modal.cancelBtnColor = `var(--${this.#color}-light)`;
+      this.#modal.show();
       return;
     }
 
-    this.#setCurrentTimeAndColor(event);
-  }
+    this.#selectedBtn = this.#lastBtnClicked;
+    this.#setCurrentTimeAndColor();
+    this.#updateUiColor();
+  };
 
-  #updateUiColor(event) {
-    this.#mainEl.style.backgroundColor = `var(--${this.#color}-light)`;
-    this.#sectionTimerEl.style.backgroundColor = `var(--${
-      this.#color
-    }-accent-light)`;
-    this.#btnStartPause.style.color = `var(--${this.#color}-accent)`;
-    this.#progressBarTimer.setBackgroundColor(`var(--${this.#color}-accent)`);
-    if (event) {
-      event.target.style.backgroundColor = `var(--${this.#color}-accent)`;
-    }
-  }
+  #updateUiColor = () => {
+    this.#mainEl.style.backgroundColor = `var(--${this.#color}-very-light)`;
+    this.#sectionTimerEl.style.backgroundColor = `var(--${this.#color}-light)`;
+    this.#btnStartPause.style.color = `var(--${this.#color}-dark)`;
+    this.#progressBarTimer.backgroundColor = `var(--${this.#color}-dark)`;
+    this.#lastBtnClicked.style.backgroundColor = `var(--${this.#color}-dark)`;
+  };
 
-  #setCurrentTimeAndColor(event) {
-    this.#btnStartPause.removeEventListener('click', this.#boundFnToStartTimer);
+  #setCurrentTimeAndColor() {
+    this.#btnStartPause.removeEventListener('click', this.#startHandler);
 
-    if (event.target === this.#btnFocusTimer) {
+    if (this.#selectedBtn === this.#btnFocusTimer) {
       this.#timer.setTimerMinSec(25, 0);
       this.#color = 'red';
-    } else if (event.target === this.#btnShortBreak) {
+    } else if (this.#selectedBtn === this.#btnShortBreak) {
       this.#timer.setTimerMinSec(0, 5);
       this.#color = 'teal';
-    } else {
+    } else if (this.#selectedBtn === this.#btnLongBreak) {
       this.#timer.setTimerMinSec(10, 0);
       this.#color = 'indigo';
     }
-
-    this.#currentBtn = event.target;
-
-    this.#updateUiColor(event);
 
     if (this.#btnStartPause.textContent !== 'Start') {
       this.#btnStartPause.textContent = 'Start';
     }
 
-    this.#progressBarTimer.setProgress(0);
+    this.#progressBarTimer.progress = 0;
 
-    this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
+    this.#btnStartPause.addEventListener('click', this.#startHandler);
     this.#setTimerText();
   }
 
   #setTimerText() {
-    this.#timerTextEl.textContent = this.#timer.getUiTime();
+    this.#timerTextEl.textContent = this.#timer.uiTime;
   }
 
-  #confirmModalHandler(event) {
-    this.#modal.hide();
+  #confirmModalHandler = () => {
     this.#stop();
-    this.#setCurrentTimeAndColor(event);
-    this.#mouseLeaveColorHandler(event);
-  }
+    this.#selectedBtn = this.#lastBtnClicked;
+    this.#setCurrentTimeAndColor();
+    this.#updateUiColor();
+    this.#lastBtnClicked.dispatchEvent(new Event('mouseleave'));
+  };
 
-  #cancelModalHandler() {
-    this.#modal.hide();
-    this.#start();
-  }
+  #cancelModalHandler = () => {
+    this.#startHandler();
+  };
 
-  #start() {
+  #startHandler = () => {
     console.log('start ui');
 
-    this.#btnStartPause.removeEventListener('click', this.#boundFnToStartTimer);
+    this.#btnStartPause.removeEventListener('click', this.#startHandler);
 
-    let totalDuration = this.#timer.getTotalTime();
+    let totalDuration = this.#timer.totalTime;
 
     if (this.#btnStartPause.textContent === 'Restart') {
-      this.#progressBarTimer.setProgress(0);
+      this.#progressBarTimer.progress = 0;
       this.#timer.restart();
       this.#setTimerText();
     } else {
@@ -206,52 +194,45 @@ class UiTimer {
     this.#btnStartPause.textContent = 'Pause';
 
     this.#timerId = setInterval(() => {
-      if (this.#timer.getUiTime() === '00:00') {
+      if (this.#timer.uiTime === '00:00') {
         clearInterval(this.#timerId);
         this.#setTimerText();
-        this.#btnStartPause.removeEventListener(
-          'click',
-          this.#boundFnToPauseTimer
-        );
+        this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
         this.#btnStartPause.textContent = 'Restart';
-        this.#btnStartPause.addEventListener(
-          'click',
-          this.#boundFnToStartTimer
-        );
-        this.#progressBarTimer.setProgress(100);
+        this.#btnStartPause.addEventListener('click', this.#startHandler);
+        this.#progressBarTimer.progress = 100;
         return;
       }
       this.#setTimerText();
       this.#updateProgressBar(totalDuration);
     }, 1000);
 
-    this.#boundFnToPauseTimer = this.#pause.bind(this);
-    this.#btnStartPause.addEventListener('click', this.#boundFnToPauseTimer);
-  }
+    this.#btnStartPause.addEventListener('click', this.#pauseHandler);
+  };
 
   #updateProgressBar(totalDuration) {
-    let currentTime = this.#timer.getMinutes() * 60 + this.#timer.getSeconds();
+    let currentTime = this.#timer.minutes * 60 + this.#timer.seconds;
     let progressPercentage = (
       100 -
       (currentTime / totalDuration) * 100
     ).toFixed(2);
-    this.#progressBarTimer.setProgress(progressPercentage);
+    this.#progressBarTimer.progress = progressPercentage;
   }
 
-  #pause() {
+  #pauseHandler = () => {
     console.log('pause ui');
     clearInterval(this.#timerId);
     this.#timer.pause();
-    this.#btnStartPause.textContent = 'Start';
-    this.#btnStartPause.removeEventListener('click', this.#boundFnToPauseTimer);
-    this.#btnStartPause.addEventListener('click', this.#boundFnToStartTimer);
-  }
+    this.#btnStartPause.textContent = 'Resume';
+    this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
+    this.#btnStartPause.addEventListener('click', this.#startHandler);
+  };
 
   #stop() {
     console.log('stop ui');
     clearInterval(this.#timerId);
     this.#timer.stop();
-    this.#progressBarTimer.setProgress(0);
+    this.#progressBarTimer.progress = 0;
     this.#setTimerText();
   }
 }

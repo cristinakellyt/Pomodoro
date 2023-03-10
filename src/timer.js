@@ -92,23 +92,23 @@ class Timer {
     this.#setUiTime();
   }
 
-  getUiTime() {
+  get uiTime() {
     return this.#uiTime;
   }
 
-  getMinutes() {
+  get minutes() {
     return parseInt(this.#counter / 60);
   }
 
-  getSeconds() {
+  get seconds() {
     return parseInt(this.#counter % 60);
   }
 
-  getStatus() {
+  get status() {
     return this.#timerStatus;
   }
 
-  getTotalTime() {
+  get totalTime() {
     if (this.#timerType === Timer.types.countUp) {
       return this.#finalTime;
     } else if (this.#timerType === Timer.types.countDown) {
@@ -126,8 +126,8 @@ class Timer {
   }
 
   #setUiTime() {
-    let minutes = this.getMinutes();
-    let seconds = this.getSeconds();
+    let minutes = this.minutes;
+    let seconds = this.seconds;
     let uiMinutes = minutes < 10 ? '0' + minutes : minutes;
     let uiSeconds = seconds < 10 ? '0' + seconds : seconds;
 

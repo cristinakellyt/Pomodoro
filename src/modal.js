@@ -3,8 +3,6 @@ class Modal {
   #contentBox;
   #confirmBtnEl;
   #cancelBtnEl;
-  #cancelCallback;
-  #confirmCallback;
 
   constructor({
     title = 'Title',
@@ -31,11 +29,13 @@ class Modal {
     this.#confirmBtnEl.className = 'btn';
     this.#confirmBtnEl.textContent = confirmBtnText;
     this.#confirmBtnEl.style.backgroundColor = colorLight;
+    this.#confirmBtnEl.addEventListener('click', this.#confirm);
 
     this.#cancelBtnEl = document.createElement('button');
     this.#cancelBtnEl.className = 'btn';
     this.#cancelBtnEl.textContent = cancelBtnText;
     this.#cancelBtnEl.style.backgroundColor = colorDark;
+    this.#cancelBtnEl.addEventListener('click', this.#cancel);
 
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'modal-box__btns';
@@ -48,23 +48,23 @@ class Modal {
     this.#mainDiv.appendChild(this.#contentBox);
   }
 
-  onConfirm(callback) {
-    if (typeof callback !== 'function')
-      throw new TypeError('callback is not a function');
+  #confirm = (event) => {
+    this.#hide();
+    const confirmEvent = new Event('confirm', {
+      bubbles: true,
+      composed: true,
+    });
+    event.target.dispatchEvent(confirmEvent);
+  };
 
-    this.#confirmBtnEl.removeEventListener('click', this.#confirmCallback);
-    this.#confirmCallback = callback;
-    this.#confirmBtnEl.addEventListener('click', this.#confirmCallback);
-  }
-
-  onCancel(callback) {
-    if (typeof callback !== 'function')
-      throw new TypeError('callback is not a function');
-
-    this.#cancelBtnEl.removeEventListener('click', this.#cancelCallback);
-    this.#cancelCallback = callback;
-    this.#cancelBtnEl.addEventListener('click', this.#cancelCallback);
-  }
+  #cancel = (event) => {
+    this.#hide();
+    const cancelEvent = new Event('cancel', {
+      bubbles: true,
+      composed: true,
+    });
+    event.target.dispatchEvent(cancelEvent);
+  };
 
   appendTo(element) {
     if (!(element instanceof HTMLElement))
@@ -77,7 +77,7 @@ class Modal {
     this.#mainDiv.classList.add('show-modal');
   }
 
-  hide() {
+  #hide() {
     this.#mainDiv.classList.remove('show-modal');
   }
 
