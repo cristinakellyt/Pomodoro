@@ -1,7 +1,6 @@
 {
-  "liveServer.settings.port": 5501,
   "eslint.enable": true,
-  "eslint.format.enable": true,
+  "eslint.format.enable": false,
   "editor.formatOnSave": true,
   "prettier.enable": true
 }
