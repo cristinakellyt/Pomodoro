@@ -1,51 +1,134 @@
-class Modal {
-  #mainDiv;
+export class Modal extends HTMLElement {
   #contentBox;
   #confirmBtnEl;
   #cancelBtnEl;
 
-  constructor({
-    title = 'Title',
-    subtitle = 'Subtitle',
-    colorDark = 'black',
-    colorLight = 'pink',
-    confirmBtnText = 'Yes',
-    cancelBtnText = 'No',
-  }) {
-    this.#mainDiv = document.createElement('div');
-    this.#mainDiv.className = 'modal';
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
 
-    this.#contentBox = document.createElement('div');
-    this.#contentBox.className = 'modal-box';
-    this.#contentBox.style.borderColor = colorDark;
+  connectedCallback() {
+    this.shadowRoot.innerHTML = `
+    <style>
+    #backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-height: 100vh;
+      width: 100%;
+      pointer-events: none;
+      backdrop-filter: blur(2px);
+      z-index: 10;
+      opacity: 0;
+      
+    }
 
-    const titleEl = document.createElement('h2');
-    titleEl.textContent = title;
+    #modal-box {
+      position: fixed;
+      top: 10vh;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+      width: 50rem;
+      background-color: rgb(255, 255, 255);
+      border-radius: 5px;
+      border: 2px solid;
+      pointer-events: none;
+      z-index: 100;
+      opacity:0;
+      transition: all 0.2s ease-out;
+    }
 
-    const subtitleEl = document.createElement('p');
-    subtitleEl.textContent = subtitle;
+    :host([opened]) #backdrop,
+    :host([opened]) #modal-box{
+      opacity: 1;
+      pointer-events: all
+    }
 
-    this.#confirmBtnEl = document.createElement('button');
-    this.#confirmBtnEl.className = 'btn';
-    this.#confirmBtnEl.textContent = confirmBtnText;
-    this.#confirmBtnEl.style.backgroundColor = colorLight;
-    this.#confirmBtnEl.addEventListener('click', this.#confirm);
+    :host([opened]) .modal-box{
+      top: 15vh;
+    }
+    
+    #modal-box__btns {
+      display: flex;
+      gap: 10rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
 
-    this.#cancelBtnEl = document.createElement('button');
-    this.#cancelBtnEl.className = 'btn';
-    this.#cancelBtnEl.textContent = cancelBtnText;
-    this.#cancelBtnEl.style.backgroundColor = colorDark;
+    .btn {
+      font-size: 2rem;
+      font-weight: 600;
+      padding: 0.8rem 4rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0px 3px 12px 5px #00000021;
+      transition: all 0.2s;
+      color: rgb(73, 26, 26);
+      ;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px) scale(1.05);
+    }
+    
+    .btn:active {
+      transform: translateY(0px) scale(1);
+    }
+    </style>
+
+    <div id="backdrop"></div>
+      <div id="modal-box">
+      <slot name="title">Title</slot>
+      <slot name="subtitle">Subtitle</slot>
+
+        <div id="modal-box__btns">
+        <button class="btn cancel-button"> <slot name="cancel-button"> No </slot> </button>
+        <button class="btn confirm-button"> <slot name="confirm-button"> Yes </slot> </button>
+        </div>
+      </div>
+    
+    `;
+
+    this.#contentBox = this.shadowRoot.getElementById('modal-box');
+    this.#confirmBtnEl = this.shadowRoot.querySelector('.confirm-button');
+    this.#cancelBtnEl = this.shadowRoot.querySelector('.cancel-button');
+
+    this.setAttribute('color-dark', 'rgb(198, 71, 71, 0.77)');
+    this.setAttribute('color-light', 'rgba(198, 71, 71, 0.21)');
+
     this.#cancelBtnEl.addEventListener('click', this.#cancel);
+    this.#confirmBtnEl.addEventListener('click', this.#confirm);
+  }
 
-    const buttonsDiv = document.createElement('div');
-    buttonsDiv.className = 'modal-box__btns';
-    buttonsDiv.appendChild(this.#cancelBtnEl);
-    buttonsDiv.appendChild(this.#confirmBtnEl);
+  static get observedAttributes() {
+    return ['color-light', 'color-dark'];
+  }
 
-    this.#contentBox.appendChild(titleEl);
-    this.#contentBox.appendChild(subtitleEl);
-    this.#contentBox.appendChild(buttonsDiv);
-    this.#mainDiv.appendChild(this.#contentBox);
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+    if (name === 'color-light') {
+      this.#cancelBtnEl.style.backgroundColor = `${newValue}`;
+      return;
+    }
+
+    if (name === 'color-dark') {
+      this.#confirmBtnEl.style.backgroundColor = `${newValue}`;
+      this.#contentBox.style.borderColor = `${newValue}`;
+      return;
+    }
+  }
+
+  disconnectedCallback() {
+    this.#cancelBtnEl.removeEventListener('click', this.#cancel);
+    this.#confirmBtnEl.removeEventListener('click', this.#confirm);
   }
 
   #confirm = (event) => {
@@ -66,32 +149,11 @@ class Modal {
     event.target.dispatchEvent(cancelEvent);
   };
 
-  appendTo(element) {
-    if (!(element instanceof HTMLElement))
-      throw new TypeError('element is not an instance of HTMLElement');
-
-    element.appendChild(this.#mainDiv);
-  }
-
   show() {
-    this.#mainDiv.classList.add('show-modal');
+    this.setAttribute('opened', '');
   }
 
   #hide() {
-    this.#mainDiv.classList.remove('show-modal');
-  }
-
-  set borderColor(color) {
-    this.#contentBox.style.borderColor = color;
-  }
-
-  set confirmBtnColor(color) {
-    this.#confirmBtnEl.style.backgroundColor = color;
-  }
-
-  set cancelBtnColor(color) {
-    this.#cancelBtnEl.style.backgroundColor = color;
+    this.removeAttribute('opened');
   }
 }
-
-export { Modal };
