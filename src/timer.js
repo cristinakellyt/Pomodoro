@@ -109,11 +109,13 @@ class Timer {
   }
 
   get totalTime() {
+    let totalTime;
     if (this.#timerType === Timer.types.countUp) {
-      return this.#finalTime;
+      totalTime = this.#finalTime;
     } else if (this.#timerType === Timer.types.countDown) {
-      return this.#initialTime;
+      totalTime = this.#initialTime;
     }
+    return totalTime;
   }
 
   #update() {
