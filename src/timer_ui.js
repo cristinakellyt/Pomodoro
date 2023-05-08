@@ -80,18 +80,19 @@ class UiTimer {
   }
 
   #createModal() {
-    let modalContent = {
-      title: 'There is a timer running!',
-      subtitle:
-        'The timer will stop if you continue. Are you sure you want to leave?',
-      colorLight: `var(--${this.#color}-very-light)`,
-      colorDark: `var(--${this.#color}-light)`,
-      confirmBtnText: 'Yes',
-      cancelBtnText: 'No',
-    };
+    this.#modal = document.createElement('modal-container');
 
-    this.#modal = new Modal(modalContent);
-    this.#modal.appendTo(this.#mainEl);
+    const title = document.createElement('h2');
+    title.textContent = 'There is a timer running!';
+    title.setAttribute('slot', 'title');
+
+    const subtitle = document.createElement('p');
+    subtitle.textContent = `The timer will stop if you continue. Are you sure you want to leave?`;
+    subtitle.setAttribute('slot', 'subtitle');
+
+    this.#modal.appendChild(title);
+    this.#modal.appendChild(subtitle);
+    this.#mainEl.appendChild(this.#modal);
 
     this.#mainEl.addEventListener('confirm', this.#confirmModalHandler);
     this.#mainEl.addEventListener('cancel', this.#cancelModalHandler);
@@ -116,9 +117,11 @@ class UiTimer {
       this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
       clearInterval(this.#timerId);
       this.#timer.pause();
-      this.#modal.borderColor = `var(--${this.#color}-light)`;
-      this.#modal.confirmBtnColor = `var(--${this.#color}-very-light)`;
-      this.#modal.cancelBtnColor = `var(--${this.#color}-light)`;
+      this.#modal.setAttribute('color-dark', `var(--${this.#color}-light)`);
+      this.#modal.setAttribute(
+        'color-light',
+        `var(--${this.#color}-very-light)`
+      );
       this.#modal.show();
       return;
     }
