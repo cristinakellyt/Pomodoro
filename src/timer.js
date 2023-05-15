@@ -30,8 +30,8 @@ class Timer {
   }
 
   start() {
+    this.#timerStatus = Timer.status.running;
     this.#timerId = setInterval(() => {
-      this.#timerStatus = Timer.status.running;
       this.#update();
       if (this.#counter === this.#finalTime) {
         this.pause();
