@@ -1,8 +1,22 @@
+class TimerParameterError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'TimerParameterError';
+  }
+}
+
+class InvocationMethodError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvocationMethodError';
+  }
+}
+
 class Timer {
-  #uiTime;
+  #displayTime;
   #initialTime;
   #finalTime;
-  #counter;
+  #currentTime;
   #timerId;
   #timerType;
   #timerStatus;
@@ -15,30 +29,63 @@ class Timer {
   });
 
   static types = Object.freeze({
-    countDown: 'countDown',
-    countUp: 'countUp',
+    countdown: 'countdown',
+    countup: 'countup',
   });
 
-  constructor(min, sec, type = Timer.types.countDown) {
-    if (type !== Timer.types.countUp && type !== Timer.types.countDown) {
-      throw new Error(
-        `Invalid parameter. Type should be one of the available values in enum type object in Timer class`
+  get displayTime() {
+    return this.#displayTime;
+  }
+
+  get minutes() {
+    return parseInt(this.#currentTime / 60);
+  }
+
+  get seconds() {
+    return parseInt(this.#currentTime % 60);
+  }
+
+  get status() {
+    return this.#timerStatus;
+  }
+
+  get totalTime() {
+    let totalTime;
+    if (this.#timerType === Timer.types.countup) {
+      totalTime = this.#finalTime;
+    } else if (this.#timerType === Timer.types.countdown) {
+      totalTime = this.#initialTime;
+    }
+    return totalTime;
+  }
+
+  get timerType() {
+    return this.#timerType;
+  }
+
+  constructor(min, sec, type = Timer.types.countdown) {
+    if (!Object.values(Timer.types).includes(type)) {
+      throw new TimerParameterError(
+        `Invalid parameter. Type should be one of the available values in the Timer.types object.`
       );
     }
     this.#timerType = type;
-    this.setTimerMinSec(min, sec);
+    this.setMinSec(min, sec);
   }
 
   start() {
+    if (this.#timerStatus === Timer.status.running) {
+      throw new InvocationMethodError(`The timer is already running.`);
+    }
     this.#timerStatus = Timer.status.running;
     this.#timerId = setInterval(() => {
       this.#update();
-      if (this.#counter === this.#finalTime) {
+      if (this.#currentTime === this.#finalTime) {
         this.pause();
         this.#timerStatus = Timer.status.finished;
         return;
       }
-      console.log('callback', this.#uiTime);
+      console.log('callback', this.#displayTime);
     }, 1000);
     console.log('start');
   }
@@ -51,90 +98,69 @@ class Timer {
 
   pause() {
     console.log('pause');
+    if (this.#timerStatus === Timer.status.paused) {
+      throw new InvocationMethodError(`The timer is already paused.`);
+    }
     clearInterval(this.#timerId);
     this.#timerStatus = Timer.status.paused;
   }
 
   stop() {
     console.log('stop');
+    if (this.#timerStatus === Timer.status.stopped) {
+      throw new InvocationMethodError(`The timer is already stopped.`);
+    }
     clearInterval(this.#timerId);
-    this.#counter = this.#initialTime;
-    this.#setUiTime();
+    this.#currentTime = this.#initialTime;
+    this.#setDisplayTime();
     this.#timerStatus = Timer.status.stopped;
   }
 
-  setTimerMinSec(min, sec) {
+  setMinSec(min, sec) {
     if (sec < 0 || sec >= 60 || !Number.isInteger(sec)) {
-      throw new Error(
+      throw new TimerParameterError(
         `Invalid parameter. Seconds should be a positive integer number between 0 and 59`
       );
     }
 
     if (min < 0 || !Number.isInteger(min)) {
-      throw new Error(
+      throw new TimerParameterError(
         `Invalid parameter. Minutes should be a positive integer number`
       );
     }
 
     switch (this.#timerType) {
-      case Timer.types.countUp:
+      case Timer.types.countup:
         this.#initialTime = 0;
         this.#finalTime = min * 60 + sec;
-        this.#counter = this.#initialTime;
+        this.#currentTime = this.#initialTime;
         break;
-      case Timer.types.countDown:
+      case Timer.types.countdown:
         this.#initialTime = min * 60 + sec;
         this.#finalTime = 0;
-        this.#counter = this.#initialTime;
+        this.#currentTime = this.#initialTime;
         break;
     }
 
-    this.#setUiTime();
-  }
-
-  get uiTime() {
-    return this.#uiTime;
-  }
-
-  get minutes() {
-    return parseInt(this.#counter / 60);
-  }
-
-  get seconds() {
-    return parseInt(this.#counter % 60);
-  }
-
-  get status() {
-    return this.#timerStatus;
-  }
-
-  get totalTime() {
-    let totalTime;
-    if (this.#timerType === Timer.types.countUp) {
-      totalTime = this.#finalTime;
-    } else if (this.#timerType === Timer.types.countDown) {
-      totalTime = this.#initialTime;
-    }
-    return totalTime;
+    this.#setDisplayTime();
   }
 
   #update() {
-    if (this.#timerType === Timer.types.countDown) {
-      this.#counter--;
+    if (this.#timerType === Timer.types.countdown) {
+      this.#currentTime--;
     } else {
-      this.#counter++;
+      this.#currentTime++;
     }
-    this.#setUiTime();
+    this.#setDisplayTime();
   }
 
-  #setUiTime() {
+  #setDisplayTime() {
     let minutes = this.minutes;
     let seconds = this.seconds;
-    let uiMinutes = minutes < 10 ? '0' + minutes : minutes;
-    let uiSeconds = seconds < 10 ? '0' + seconds : seconds;
-
-    this.#uiTime = `${uiMinutes}:${uiSeconds}`;
+    let displayMinutes = minutes < 10 ? '0' + minutes : minutes;
+    let displaySeconds = seconds < 10 ? '0' + seconds : seconds;
+    this.#displayTime = `${displayMinutes}:${displaySeconds}`;
   }
 }
 
-export { Timer };
+export default Timer;
