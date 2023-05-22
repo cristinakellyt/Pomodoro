@@ -1,5 +1,4 @@
-import { Timer } from './timer.js';
-import { Modal } from './modal.js';
+import Timer from './timer.js';
 
 class UiTimer {
   #sectionTimerEl;
@@ -20,7 +19,7 @@ class UiTimer {
   constructor(main, color) {
     this.#mainEl = main;
     this.#color = color;
-    this.#timer = new Timer(25, 0, Timer.types.countDown);
+    this.#timer = new Timer(25, 0, Timer.types.countdown);
     this.#createTimerElement();
   }
 
@@ -30,42 +29,26 @@ class UiTimer {
     const timerTypesEl = document.createElement('div');
     timerTypesEl.className = 'timer-type';
 
-    this.#btnFocusTimer = document.createElement('h2');
-    this.#btnFocusTimer.id = 'focus-timer';
-    this.#btnFocusTimer.textContent = 'Focus Time';
-    this.#addTimerBtnEvents(this.#btnFocusTimer);
-    this.#selectedBtn = this.#btnFocusTimer;
-    this.#lastBtnClicked = this.#btnFocusTimer;
-
-    this.#btnShortBreak = document.createElement('h2');
-    this.#btnShortBreak.id = 'short-break';
-    this.#btnShortBreak.textContent = 'Short Break';
-    this.#addTimerBtnEvents(this.#btnShortBreak);
-
-    this.#btnLongBreak = document.createElement('h2');
-    this.#btnLongBreak.id = 'long-break';
-    this.#btnLongBreak.textContent = 'Long Break';
-    this.#addTimerBtnEvents(this.#btnLongBreak);
-
     this.#timerTextEl = document.createElement('p');
     this.#timerTextEl.className = 'countdown';
 
-    this.#btnStartPause = document.createElement('button');
-    this.#btnStartPause.className = 'btn';
-    this.#btnStartPause.id = 'btn-start-pause';
-    this.#btnStartPause.textContent = 'Start';
-    this.#btnStartPause.addEventListener('click', this.#startHandler);
-
     this.#progressBar = document.createElement('progress-bar');
 
-    timerTypesEl.appendChild(this.#btnFocusTimer);
-    timerTypesEl.appendChild(this.#btnShortBreak);
-    timerTypesEl.appendChild(this.#btnLongBreak);
+    const buttons = this.#createButtons();
+
     this.#sectionTimerEl.appendChild(timerTypesEl);
     this.#sectionTimerEl.appendChild(this.#timerTextEl);
-    this.#sectionTimerEl.appendChild(this.#btnStartPause);
     this.#sectionTimerEl.appendChild(this.#progressBar);
     this.#mainEl.appendChild(this.#sectionTimerEl);
+
+    buttons.forEach((btn) => {
+      if (btn === this.#btnStartPause) {
+        this.#sectionTimerEl.appendChild(btn);
+      } else {
+        timerTypesEl.appendChild(btn);
+      }
+      this.#customiseTimerTypesButtons(btn);
+    });
 
     this.#updateUiColor();
     this.#lastBtnClicked.dispatchEvent(new Event('mouseleave'));
@@ -73,10 +56,41 @@ class UiTimer {
     this.#createModal();
   }
 
-  #addTimerBtnEvents(btn) {
-    btn.addEventListener('mouseover', this.#mouseHoverColorHandler);
-    btn.addEventListener('mouseleave', this.#mouseLeaveColorHandler);
-    btn.addEventListener('click', this.#checkTimerStatusHandler);
+  #customiseTimerTypesButtons(btn) {
+    if (btn === this.#btnStartPause) {
+      btn.addEventListener('click', this.#startHandler);
+      btn.setAttribute('button-size', 'big-button');
+    } else {
+      btn.addEventListener('mouseover', this.#mouseHoverColorHandler);
+      btn.addEventListener('mouseleave', this.#mouseLeaveColorHandler);
+      btn.addEventListener('click', this.#checkTimerStatusHandler);
+      btn.setAttribute('background-color', 'transparent');
+    }
+  }
+
+  #createButtons() {
+    let buttons = [];
+    this.#btnFocusTimer = document.createElement('zk-button');
+    this.#btnFocusTimer.textContent = 'Focus Time';
+    this.#selectedBtn = this.#btnFocusTimer;
+    this.#lastBtnClicked = this.#btnFocusTimer;
+
+    this.#btnShortBreak = document.createElement('zk-button');
+    this.#btnShortBreak.textContent = 'Short Break';
+
+    this.#btnLongBreak = document.createElement('zk-button');
+    this.#btnLongBreak.textContent = 'Long Break';
+
+    this.#btnStartPause = document.createElement('zk-button');
+    this.#btnStartPause.textContent = 'Start';
+
+    buttons.push(
+      this.#btnFocusTimer,
+      this.#btnShortBreak,
+      this.#btnLongBreak,
+      this.#btnStartPause
+    );
+    return buttons;
   }
 
   #createModal() {
@@ -99,30 +113,25 @@ class UiTimer {
   }
 
   #mouseHoverColorHandler = (event) => {
-    event.target.style.backgroundColor = `var(--${this.#color}-dark)`;
+    event.target.setAttribute('background-color', `var(--${this.#color}-dark)`);
   };
 
   #mouseLeaveColorHandler = (event) => {
-    event.target.style.backgroundColor = 'transparent';
+    event.target.setAttribute('background-color', 'transparent');
   };
 
   #checkTimerStatusHandler = (event) => {
     if (this.#selectedBtn === event.target) return;
     this.#lastBtnClicked = event.target;
 
-    if (
-      this.#timer.status === Timer.status.running ||
-      this.#timer.status === Timer.status.paused
-    ) {
+    if (this.#timer.status === Timer.status.running) {
+      this.#pauseHandler();
+      this.#showModal();
+      return;
+    } else if (this.#timer.status === Timer.status.paused) {
       this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
       clearInterval(this.#timerId);
-      this.#timer.pause();
-      this.#modal.setAttribute('color-dark', `var(--${this.#color}-light)`);
-      this.#modal.setAttribute(
-        'color-light',
-        `var(--${this.#color}-very-light)`
-      );
-      this.#modal.show();
+      this.#showModal();
       return;
     }
 
@@ -131,28 +140,40 @@ class UiTimer {
     this.#updateUiColor();
   };
 
+  #showModal() {
+    this.#modal.setAttribute('color-dark', `var(--${this.#color}-light)`);
+    this.#modal.setAttribute('color-light', `var(--${this.#color}-very-light)`);
+    this.#modal.show();
+  }
+
   #updateUiColor = () => {
     this.#mainEl.style.backgroundColor = `var(--${this.#color}-very-light)`;
     this.#sectionTimerEl.style.backgroundColor = `var(--${this.#color}-light)`;
-    this.#btnStartPause.style.color = `var(--${this.#color}-dark)`;
+    this.#btnStartPause.setAttribute(
+      'background-color',
+      `var(--${this.#color}-dark)`
+    );
     this.#progressBar.setAttribute(
       'backdrop-color',
       `var(--${this.#color}-dark)`
     );
-    this.#lastBtnClicked.style.backgroundColor = `var(--${this.#color}-dark)`;
+    this.#lastBtnClicked.setAttribute(
+      'background-color',
+      `var(--${this.#color}-dark)`
+    );
   };
 
   #setCurrentTimeAndColor() {
     this.#btnStartPause.removeEventListener('click', this.#startHandler);
 
     if (this.#selectedBtn === this.#btnFocusTimer) {
-      this.#timer.setTimerMinSec(25, 0);
+      this.#timer.setMinSec(25, 0);
       this.#color = 'red';
     } else if (this.#selectedBtn === this.#btnShortBreak) {
-      this.#timer.setTimerMinSec(0, 5);
+      this.#timer.setMinSec(0, 5);
       this.#color = 'teal';
     } else if (this.#selectedBtn === this.#btnLongBreak) {
-      this.#timer.setTimerMinSec(10, 0);
+      this.#timer.setMinSec(10, 0);
       this.#color = 'indigo';
     }
 
@@ -167,7 +188,7 @@ class UiTimer {
   }
 
   #setTimerText() {
-    this.#timerTextEl.textContent = this.#timer.uiTime;
+    this.#timerTextEl.textContent = this.#timer.displayTime;
   }
 
   #confirmModalHandler = () => {
@@ -199,7 +220,7 @@ class UiTimer {
     this.#btnStartPause.textContent = 'Pause';
 
     this.#timerId = setInterval(() => {
-      if (this.#timer.uiTime === '00:00') {
+      if (this.#timer.displayTime === '00:00') {
         clearInterval(this.#timerId);
         this.#setTimerText();
         this.#btnStartPause.removeEventListener('click', this.#pauseHandler);
