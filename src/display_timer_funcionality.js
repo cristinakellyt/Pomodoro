@@ -1,4 +1,4 @@
-import Timer from './timer';
+import Timer from './timer.js';
 import CreateTimerElements from './create_display_timer_elements';
 
 class DisplayTimerFunctionality {
@@ -94,5 +94,61 @@ class DisplayTimerFunctionality {
     this.#element.timerTextEl.textContent = this.#timer.displayTime;
   }
 }
+
+class CountUp extends DisplayTimerFunctionality {
+  constructor(hostElemenetID) {
+    super(1, 0, Timer.types.countup);
+    this.hostElemenet = document.getElementById(hostElemenetID);
+    // super.element.btnFocusTimer.setAttribute('button-size', 'transparent');
+    this.appendElements();
+    this.customiseElements();
+  }
+
+  appendElements() {
+    this.hostElemenet.appendChild(super.element.timerTypesEl);
+    super.element.timerTypesEl.appendChild(super.element.btnFocusTimer);
+    this.hostElemenet.appendChild(super.element.timerTextEl);
+    this.hostElemenet.appendChild(super.element.btnStartPause);
+    super.element.timerTextEl.textContent = this.timer.displayTime;
+  }
+
+  customiseElements() {
+    super.element.btnFocusTimer.textContent = 'Cronometro';
+    super.element.btnFocusTimer.addEventListener(
+      'click',
+      this.changeFunctionality
+    );
+  }
+
+  changeFunctionality = () => {
+    if (
+      super.timer.status === Timer.status.running ||
+      super.timer.status === Timer.status.paused
+    ) {
+      this.stop();
+      super.element.btnStartPause.removeEventListener(
+        'click',
+        this.pauseHandler
+      );
+      super.element.btnStartPause.addEventListener('click', this.startHandler);
+      super.element.btnStartPause.textContent = 'Start';
+    }
+
+    if (super.timer.timerType === Timer.types.countup) {
+      super.element.btnFocusTimer.textContent = 'Timer';
+      super.timer.timerType = Timer.types.countdown;
+      super.timer.setMinSec(1, 0);
+      super.element.timerTextEl.textContent = this.timer.displayTime;
+    } else if (super.timer.timerType === Timer.types.countdown) {
+      super.element.btnFocusTimer.textContent = 'Cronometro';
+      super.timer.timerType = Timer.types.countup;
+      super.timer.setMinSec(1, 0);
+      super.element.timerTextEl.textContent = this.timer.displayTime;
+    }
+  };
+}
+
+new CountUp('countup-watch');
+// testingWatch.startHandler();
 
 export default DisplayTimerFunctionality;

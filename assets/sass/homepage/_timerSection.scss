@@ -33,3 +33,15 @@ section {
   font-size: 14rem;
   font-weight: 500;
 }
+
+#countup-watch {
+  background-color: rgba(0, 33, 105, 0.849);
+  color: white;
+
+  border-radius: 100rem;
+  margin-bottom: 4rem;
+}
+
+#countup-watch .countdown {
+  font-size: 10rem;
+}

@@ -72,6 +72,7 @@ export class Button extends HTMLElement {
 
     if (name === 'background-color') {
       this.#button.style.backgroundColor = newValue;
+      console.log(newValue);
     }
 
     if (name === 'button-size') {

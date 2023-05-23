@@ -59,6 +59,10 @@ class Timer {
     return totalTime;
   }
 
+  set timerType(timerType) {
+    this.#timerType = timerType;
+  }
+
   get timerType() {
     return this.#timerType;
   }
