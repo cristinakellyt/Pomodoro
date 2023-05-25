@@ -3,11 +3,11 @@ class CreateTimerElements {
   #timerTypesEl;
   #timerTextEl;
   #progressBar;
-  #buttons;
-  #btnFocusTimer;
-  #btnShortBreak;
-  #btnLongBreak;
-  #btnStartPause;
+  #buttons!: HTMLElement[];
+  #btnFocusTimer!: HTMLElement;
+  #btnShortBreak!: HTMLElement;
+  #btnLongBreak!: HTMLElement;
+  #btnStartPause!: HTMLElement;
 
   get sectionTimerEl() {
     return this.#sectionTimerEl;
@@ -82,4 +82,4 @@ class CreateTimerElements {
   }
 }
 
-export default CreateTimerElements;
+export { CreateTimerElements };

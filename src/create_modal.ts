@@ -1,11 +1,11 @@
 class CreateModal {
-  #modal;
+  #modal: HTMLElement;
 
   get modalEl() {
     return this.#modal;
   }
 
-  constructor(titleText, subtitleText) {
+  constructor(titleText: string, subtitleText: string) {
     this.#modal = document.createElement('modal-container');
 
     const title = document.createElement('h2');
@@ -19,10 +19,10 @@ class CreateModal {
     this.#appendElements(title, subtitle);
   }
 
-  #appendElements(title, subtitle) {
+  #appendElements(title: HTMLHeadingElement, subtitle: HTMLParagraphElement) {
     this.#modal.appendChild(title);
     this.#modal.appendChild(subtitle);
   }
 }
 
-export default CreateModal;
+export { CreateModal };

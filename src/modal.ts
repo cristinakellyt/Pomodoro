@@ -1,7 +1,7 @@
-export class Modal extends HTMLElement {
-  #contentBox;
-  #confirmBtnEl;
-  #cancelBtnEl;
+class Modal extends HTMLElement {
+  #contentBox!: HTMLElement;
+  #confirmBtnEl!: HTMLButtonElement;
+  #cancelBtnEl!: HTMLButtonElement;
 
   constructor() {
     super();
@@ -9,7 +9,7 @@ export class Modal extends HTMLElement {
   }
 
   connectedCallback() {
-    this.shadowRoot.innerHTML = `
+    this.shadowRoot!.innerHTML = `
     <style>
     #backdrop {
       position: fixed;
@@ -97,9 +97,15 @@ export class Modal extends HTMLElement {
     
     `;
 
-    this.#contentBox = this.shadowRoot.getElementById('modal-box');
-    this.#confirmBtnEl = this.shadowRoot.querySelector('.confirm-button');
-    this.#cancelBtnEl = this.shadowRoot.querySelector('.cancel-button');
+    this.#contentBox = this.shadowRoot!.getElementById(
+      'modal-box'
+    ) as HTMLElement;
+    this.#confirmBtnEl = this.shadowRoot!.querySelector(
+      '.confirm-button'
+    ) as HTMLButtonElement;
+    this.#cancelBtnEl = this.shadowRoot!.querySelector(
+      '.cancel-button'
+    ) as HTMLButtonElement;
 
     this.setAttribute('color-dark', 'rgb(198, 71, 71, 0.77)');
     this.setAttribute('color-light', 'rgba(198, 71, 71, 0.21)');
@@ -112,7 +118,7 @@ export class Modal extends HTMLElement {
     return ['color-light', 'color-dark'];
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
     if (name === 'color-light') {
       this.#cancelBtnEl.style.backgroundColor = `${newValue}`;
@@ -131,29 +137,31 @@ export class Modal extends HTMLElement {
     this.#confirmBtnEl.removeEventListener('click', this.#confirm);
   }
 
-  #confirm = (event) => {
+  show() {
+    this.setAttribute('opened', '');
+  }
+
+  #confirm = (event: Event) => {
     this.#hide();
     const confirmEvent = new Event('confirm', {
       bubbles: true,
       composed: true,
     });
-    event.target.dispatchEvent(confirmEvent);
+    event.target!.dispatchEvent(confirmEvent);
   };
 
-  #cancel = (event) => {
+  #cancel = (event: Event) => {
     this.#hide();
     const cancelEvent = new Event('cancel', {
       bubbles: true,
       composed: true,
     });
-    event.target.dispatchEvent(cancelEvent);
+    event.target!.dispatchEvent(cancelEvent);
   };
-
-  show() {
-    this.setAttribute('opened', '');
-  }
 
   #hide() {
     this.removeAttribute('opened');
   }
 }
+
+export { Modal };
