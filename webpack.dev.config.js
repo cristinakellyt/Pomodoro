@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/app.js',
   output: {
     filename: 'app.js',
-    path: path.resolve(__dirname, 'assets', 'scripts'),
+    path: path.resolve(__dirname, 'assets', 'dist'),
     publicPath: '',
   },
   devtool: 'cheap-module-source-map',
@@ -14,7 +14,7 @@ module.exports = {
   devServer: {
     port: 9000,
     static: {
-      directory: path.resolve(__dirname, 'assets', 'scripts'),
+      directory: path.resolve(__dirname, 'assets', 'dist'),
     },
     devMiddleware: {
       index: 'index.html',
