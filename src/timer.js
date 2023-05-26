@@ -20,6 +20,7 @@ class Timer {
   #timerId;
   #timerType;
   #timerStatus;
+  #callbackList;
 
   static status = Object.freeze({
     running: 'running',
@@ -70,6 +71,7 @@ class Timer {
       );
     }
     this.#timerType = type;
+    this.#callbackList = [];
     this.setMinSec(min, sec);
   }
 
@@ -80,11 +82,6 @@ class Timer {
     this.#timerStatus = Timer.status.running;
     this.#timerId = setInterval(() => {
       this.#update();
-      if (this.#currentTime === this.#finalTime) {
-        this.pause();
-        this.#timerStatus = Timer.status.finished;
-        return;
-      }
       console.log('callback', this.#displayTime);
     }, 1000);
     console.log('start');
@@ -145,13 +142,31 @@ class Timer {
     this.#setDisplayTime();
   }
 
+  setCallbackOnTick(...callback) {
+    callback.forEach((callback) => {
+      if (!this.#callbackList.includes(callback)) {
+        this.#callbackList.push(callback);
+      }
+    });
+  }
+
   #update() {
-    if (this.#timerType === Timer.types.countdown) {
-      this.#currentTime--;
-    } else {
-      this.#currentTime++;
+    if (this.#timerStatus !== Timer.status.finished) {
+      this.#timerType === Timer.types.countdown
+        ? this.#currentTime--
+        : this.#currentTime++;
+
+      if (this.#currentTime === this.#finalTime) {
+        this.pause();
+        this.#timerStatus = Timer.status.finished;
+      }
     }
+
     this.#setDisplayTime();
+
+    this.#callbackList.forEach((callback) => {
+      callback(this.status, this.totalTime, this.displayTime);
+    });
   }
 
   #setDisplayTime() {
