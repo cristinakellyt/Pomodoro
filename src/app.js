@@ -1,7 +1,7 @@
 import './../assets/sass/main.scss';
-import { ProgressBar } from './progress_bar.js';
-import { Modal } from './modal.js';
-import { Button } from './button.js';
+import { ProgressBar } from './components/progress_bar.js';
+import { Modal } from './components/modal.js';
+import { Button } from './components/button.js';
 import { BasicTimer } from './basic_timer';
 import { UiTimer } from './timer_ui.js';
 import Timer from './timer.js';
