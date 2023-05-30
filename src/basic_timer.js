@@ -7,6 +7,7 @@ export class BasicTimer {
   timerTextEl;
   startPauseButton;
   restartEl;
+  #divForButtonsFunctionality;
   #colors;
   boundFnStartHandler;
   boundFnPauseHandler;
@@ -41,18 +42,26 @@ export class BasicTimer {
     this.timerContainerEl = document.createElement('section');
     this.timerTextEl = document.createElement('p');
     this.startPauseButton = document.createElement('zk-button');
+    this.#divForButtonsFunctionality = document.createElement('div');
     this.restartEl = document.createElement('span');
     this.restartEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 16 16"><g transform="translate(16 0) scale(-1 1)"><path fill="white" fill-rule="evenodd" d="M12.75 8a4.5 4.5 0 0 1-8.61 1.834l-1.391.565A6.001 6.001 0 0 0 14.25 8A6 6 0 0 0 3.5 4.334V2.5H2v4l.75.75h3.5v-1.5H4.352A4.5 4.5 0 0 1 12.75 8z" clip-rule="evenodd"/></g></svg>`;
   }
 
   #appendElements() {
     this.hostElement.appendChild(this.timerContainerEl);
-    this.timerContainerEl.appendChild(this.timerTextEl);
-    this.timerContainerEl.appendChild(this.startPauseButton);
-    this.timerContainerEl.appendChild(this.restartEl);
+    this.#divForButtonsFunctionality.append(
+      this.startPauseButton,
+      this.restartEl
+    );
+    this.timerContainerEl.append(
+      this.timerTextEl,
+      this.#divForButtonsFunctionality
+    );
   }
 
   #customiseElements() {
+    this.#divForButtonsFunctionality.className = 'timer-type';
+
     this.timerTextEl.textContent = this.timer.displayTime;
     this.timerTextEl.className = 'timer-text';
 
