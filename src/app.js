@@ -2,9 +2,10 @@ import './../assets/sass/main.scss';
 import { ProgressBar } from './components/progress_bar.js';
 import { Modal } from './components/modal.js';
 import { Button } from './components/button.js';
-import { BasicTimer } from './basic_timer';
-import { UiTimer } from './timer_ui.js';
 import Timer from './timer.js';
+import { UiTimer } from './timer_ui.js';
+import { BasicTimer } from './basic_timer.js';
+import TimerWithProgressBar from './timer_with_progress_bar.js';
 
 customElements.define('progress-bar', ProgressBar);
 customElements.define('modal-container', Modal);
@@ -20,4 +21,12 @@ const main = document.getElementById('main');
 
 new UiTimer(main, 'red');
 
-new BasicTimer('main', defaultColors.indigo, 0, 5, Timer.types.countdown);
+new BasicTimer('main', defaultColors.indigo, 0, 10, Timer.types.countdown);
+
+new TimerWithProgressBar(
+  'main',
+  defaultColors.indigo,
+  0,
+  5,
+  Timer.types.countdown
+);
