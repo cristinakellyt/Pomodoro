@@ -1,5 +1,5 @@
-export class Button extends HTMLElement {
-  #button;
+class Button extends HTMLElement {
+  private _button!: HTMLButtonElement;
 
   constructor() {
     super();
@@ -7,7 +7,7 @@ export class Button extends HTMLElement {
   }
 
   connectedCallback() {
-    this.shadowRoot.innerHTML = `
+    this.shadowRoot!.innerHTML = `
    <style>
    *,
    *::after,
@@ -58,7 +58,7 @@ export class Button extends HTMLElement {
   </button>
     `;
 
-    this.#button = this.shadowRoot.getElementById('btn');
+    this._button = this.shadowRoot!.getElementById('btn') as HTMLButtonElement;
     this.setAttribute('background-color', '');
     this.setAttribute('button-size', 'small-button');
   }
@@ -67,20 +67,22 @@ export class Button extends HTMLElement {
     return ['background-color', 'button-size'];
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  get element() {
+    return this._button;
+  }
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
 
     if (name === 'background-color') {
-      this.#button.style.backgroundColor = newValue;
+      this._button.style.backgroundColor = newValue;
     }
 
     if (name === 'button-size') {
-      this.#button.classList.remove(oldValue);
-      this.#button.classList.add(newValue);
+      this._button.classList.remove(oldValue);
+      this._button.classList.add(newValue);
     }
   }
-
-  get element() {
-    return this.#button;
-  }
 }
+
+export default Button;

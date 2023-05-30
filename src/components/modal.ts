@@ -1,7 +1,7 @@
-export class Modal extends HTMLElement {
-  #contentBox;
-  #confirmBtnEl;
-  #cancelBtnEl;
+class Modal extends HTMLElement {
+  private _contentBox!: HTMLElement;
+  private _confirmBtnEl!: HTMLButtonElement;
+  private _cancelBtnEl!: HTMLButtonElement;
 
   constructor() {
     super();
@@ -9,7 +9,7 @@ export class Modal extends HTMLElement {
   }
 
   connectedCallback() {
-    this.shadowRoot.innerHTML = `
+    this.shadowRoot!.innerHTML = `
     <style>
     #backdrop {
       position: fixed;
@@ -97,63 +97,75 @@ export class Modal extends HTMLElement {
     
     `;
 
-    this.#contentBox = this.shadowRoot.getElementById('modal-box');
-    this.#confirmBtnEl = this.shadowRoot.querySelector('.confirm-button');
-    this.#cancelBtnEl = this.shadowRoot.querySelector('.cancel-button');
+    this._contentBox = this.shadowRoot!.getElementById(
+      'modal-box'
+    ) as HTMLElement;
+    this._confirmBtnEl = this.shadowRoot!.querySelector(
+      '.confirm-button'
+    ) as HTMLButtonElement;
+    this._cancelBtnEl = this.shadowRoot!.querySelector(
+      '.cancel-button'
+    ) as HTMLButtonElement;
 
     this.setAttribute('color-dark', 'rgb(198, 71, 71, 0.77)');
     this.setAttribute('color-light', 'rgba(198, 71, 71, 0.21)');
 
-    this.#cancelBtnEl.addEventListener('click', this.#cancel);
-    this.#confirmBtnEl.addEventListener('click', this.#confirm);
+    this._cancelBtnEl.addEventListener('click', this.cancel);
+    this._confirmBtnEl.addEventListener('click', this.confirm);
   }
 
   static get observedAttributes() {
     return ['color-light', 'color-dark'];
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
     if (name === 'color-light') {
-      this.#cancelBtnEl.style.backgroundColor = `${newValue}`;
+      this._cancelBtnEl.style.backgroundColor = `${newValue}`;
       return;
     }
 
     if (name === 'color-dark') {
-      this.#confirmBtnEl.style.backgroundColor = `${newValue}`;
-      this.#contentBox.style.borderColor = `${newValue}`;
+      this._confirmBtnEl.style.backgroundColor = `${newValue}`;
+      this._contentBox.style.borderColor = `${newValue}`;
       return;
     }
   }
 
   disconnectedCallback() {
-    this.#cancelBtnEl.removeEventListener('click', this.#cancel);
-    this.#confirmBtnEl.removeEventListener('click', this.#confirm);
+    this._cancelBtnEl.removeEventListener('click', this.cancel);
+    this._confirmBtnEl.removeEventListener('click', this.confirm);
   }
-
-  #confirm = (event) => {
-    this.#hide();
-    const confirmEvent = new Event('confirm', {
-      bubbles: true,
-      composed: true,
-    });
-    event.target.dispatchEvent(confirmEvent);
-  };
-
-  #cancel = (event) => {
-    this.#hide();
-    const cancelEvent = new Event('cancel', {
-      bubbles: true,
-      composed: true,
-    });
-    event.target.dispatchEvent(cancelEvent);
-  };
 
   show() {
     this.setAttribute('opened', '');
   }
 
-  #hide() {
+  private confirm = (event: Event) => {
+    if (event.target) {
+      this.hide();
+      const confirmEvent = new Event('confirm', {
+        bubbles: true,
+        composed: true,
+      });
+      event.target.dispatchEvent(confirmEvent);
+    }
+  };
+
+  private cancel = (event: Event) => {
+    if (event.target) {
+      this.hide();
+      const cancelEvent = new Event('cancel', {
+        bubbles: true,
+        composed: true,
+      });
+      event.target.dispatchEvent(cancelEvent);
+    }
+  };
+
+  private hide() {
     this.removeAttribute('opened');
   }
 }
+
+export default Modal;
