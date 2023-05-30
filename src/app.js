@@ -6,6 +6,7 @@ import Timer from './timer.js';
 import { UiTimer } from './timer_ui.js';
 import { BasicTimer } from './basic_timer.js';
 import TimerWithProgressBar from './timer_with_progress_bar.js';
+import Pomodoro from './pomodoro';
 
 customElements.define('progress-bar', ProgressBar);
 customElements.define('modal-container', Modal);
@@ -30,3 +31,7 @@ new TimerWithProgressBar(
   5,
   Timer.types.countdown
 );
+
+new Pomodoro('main', defaultColors.teal, 0, 15, Timer.types.countdown);
+
+export { defaultColors };

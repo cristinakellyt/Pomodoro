@@ -108,8 +108,8 @@ class UiTimer {
     this.#modal.appendChild(subtitle);
     this.#mainEl.appendChild(this.#modal);
 
-    this.#mainEl.addEventListener('confirm', this.#confirmModalHandler);
-    this.#mainEl.addEventListener('cancel', this.#cancelModalHandler);
+    this.#modal.addEventListener('confirm', this.#confirmModalHandler);
+    this.#modal.addEventListener('cancel', this.#cancelModalHandler);
   }
 
   #mouseHoverColorHandler = (event) => {

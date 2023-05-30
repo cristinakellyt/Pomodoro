@@ -89,8 +89,12 @@ class Timer {
 
   restart() {
     console.log('restart timer');
-    this.stop();
-    this.start();
+    if (this.#timerStatus !== Timer.status.stopped) {
+      this.stop();
+      this.start();
+    } else {
+      this.start();
+    }
   }
 
   pause() {
