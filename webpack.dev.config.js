@@ -3,10 +3,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/app.js',
+  entry: './src/app.ts',
   output: {
-    filename: 'app.js',
-    path: path.resolve(__dirname, 'assets', 'scripts'),
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'assets', 'dist'),
     publicPath: '',
   },
   devtool: 'cheap-module-source-map',
@@ -14,7 +14,7 @@ module.exports = {
   devServer: {
     port: 9000,
     static: {
-      directory: path.resolve(__dirname, 'assets', 'scripts'),
+      directory: path.resolve(__dirname, 'assets', 'dist'),
     },
     devMiddleware: {
       index: 'index.html',
@@ -23,10 +23,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -38,10 +34,22 @@ module.exports = {
         },
       },
       {
+        test: /\.tsx?$/,
+        use: ['ts-loader'],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
+      {
         test: /\.hbs$/,
         use: ['handlebars-loader'],
       },
     ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
     new CleanWebpackPlugin({

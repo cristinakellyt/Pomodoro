@@ -28,8 +28,12 @@ section {
   gap: 3rem;
 }
 
-.countdown {
+.timer-text {
   font-family: 'Baloo 2', sans-serif;
   font-size: 14rem;
   font-weight: 500;
+}
+
+.restart {
+  cursor: pointer;
 }

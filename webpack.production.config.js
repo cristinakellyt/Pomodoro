@@ -4,10 +4,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/app.js',
+  entry: './src/app.ts',
   output: {
-    filename: 'app.[contenthash].js',
-    path: path.resolve(__dirname, 'assets', 'scripts'),
+    filename: 'bundle.[contenthash].js',
+    path: path.resolve(__dirname, 'assets', 'dist'),
     publicPath: '',
   },
   mode: 'production',
@@ -28,10 +28,18 @@ module.exports = {
         },
       },
       {
+        test: /\.tsx?$/,
+        use: ['ts-loader'],
+        exclude: /node_modules/,
+      },
+      {
         test: /\.hbs$/,
         use: ['handlebars-loader'],
       },
     ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
     new CleanWebpackPlugin({
