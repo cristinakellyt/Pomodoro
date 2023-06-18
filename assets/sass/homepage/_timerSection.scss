@@ -32,14 +32,14 @@ section {
   cursor: pointer;
 }
 
-.utilitie__flex-wrap-3gap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3rem;
+.setting-icon {
+  cursor: pointer;
+  align-self: flex-end;
+  margin-top: -5rem;
+  margin-right: -2rem;
 }
 
-//Will be removed because it was replaced for the above class
-.timer-type {
+.utilitie__flex-wrap-3gap {
   display: flex;
   flex-wrap: wrap;
   gap: 3rem;

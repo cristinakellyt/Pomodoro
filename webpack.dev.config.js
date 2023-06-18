@@ -43,8 +43,8 @@ module.exports = {
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.hbs$/,
-        use: ['handlebars-loader'],
+        test: /\.svg$/,
+        use: 'file-loader',
       },
     ],
   },

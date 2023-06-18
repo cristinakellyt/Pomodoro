@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --config webpack.production.config.js",
+    "build-app": "webpack --config webpack.production.config.js",
     "dev": "webpack serve --config webpack.dev.config.js --hot",
     "lint": "eslint src"
   },
@@ -28,6 +28,7 @@
     "eslint": "^8.35.0",
     "handlebars": "^4.7.7",
     "handlebars-loader": "^1.7.3",
+    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.7.2",
     "sass": "^1.58.3",

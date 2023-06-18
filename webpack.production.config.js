@@ -33,8 +33,8 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.hbs$/,
-        use: ['handlebars-loader'],
+        test: /\.svg$/,
+        use: 'file-loader',
       },
     ],
   },
