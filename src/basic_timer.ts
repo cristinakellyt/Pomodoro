@@ -113,7 +113,7 @@ class BasicTimer {
   }
 
   private customiseElements(): void {
-    this._divForButtonsFunctionality.className = 'timer-type';
+    this._divForButtonsFunctionality.className = 'utilitie__flex-wrap-3gap';
 
     this.timerTextEl.textContent = this.timer.displayTime;
     this.timerTextEl.className = 'timer-text';

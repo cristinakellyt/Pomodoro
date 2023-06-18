@@ -22,12 +22,6 @@ section {
   overflow: hidden;
 }
 
-.timer-type {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3rem;
-}
-
 .timer-text {
   font-family: 'Baloo 2', sans-serif;
   font-size: 14rem;
@@ -36,4 +30,17 @@ section {
 
 .restart {
   cursor: pointer;
+}
+
+.utilitie__flex-wrap-3gap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+
+//Will be removed because it was replaced for the above class
+.timer-type {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
 }
