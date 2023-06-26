@@ -1,4 +1,4 @@
-import './../assets/sass/main.scss';
+import './sass/main.scss';
 import ProgressBar from './components/progress_bar';
 import Modal from './components/modal';
 import Button from './components/button';

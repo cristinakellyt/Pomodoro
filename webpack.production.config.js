@@ -7,7 +7,7 @@ module.exports = {
   entry: './src/app.ts',
   output: {
     filename: 'bundle.[contenthash].js',
-    path: path.resolve(__dirname, 'assets', 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '',
   },
   mode: 'production',
@@ -49,7 +49,7 @@ module.exports = {
       filename: 'style.[contenthash].css',
     }),
     new HtmlWebpackPlugin({
-      template: 'src/index.hbs',
+      template: 'src/index.html',
     }),
   ],
 };
