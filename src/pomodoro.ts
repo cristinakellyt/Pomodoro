@@ -4,6 +4,8 @@ import { DEFAULT_COLORS } from './app';
 import { ColorTons } from './basic_timer';
 import ModalComponent from './components/modal';
 import ButtonComponent from './components/button';
+import SettingsModal from './components/settings';
+import iconSetting from './../assets/images/settings-icon.svg';
 
 class Pomodoro extends TimerWithProgressBar {
   private _btnFocusTimer!: ButtonComponent;
@@ -12,6 +14,11 @@ class Pomodoro extends TimerWithProgressBar {
   private _selectedBtn!: ButtonComponent;
   private _lastBtnClicked!: ButtonComponent;
   private _modal!: ModalComponent;
+  private _settingsModalEl!: SettingsModal;
+  private _enteredFocusMin!: number;
+  private _enteredShortBreakMin!: number;
+  private _enteredLongBreakMin!: number;
+  private _isSettingClicked!: boolean;
 
   constructor(
     hostElementId: string,
@@ -24,21 +31,39 @@ class Pomodoro extends TimerWithProgressBar {
     this.hostElement.style.backgroundColor = this.colorTheme.colorLight2;
     this.createModal();
     this.createButtons();
+    this.createModalSettings();
+
+    const _settingIconContainer = document.createElement(
+      'span'
+    ) as HTMLSpanElement;
+    _settingIconContainer.className = 'setting-icon';
+
+    const settingImg = document.createElement('img') as HTMLImageElement;
+    settingImg.setAttribute('src', iconSetting);
+    settingImg.setAttribute('alt', 'settings');
+    _settingIconContainer.appendChild(settingImg);
+
+    this.sectionTimerEl.append(_settingIconContainer);
+    _settingIconContainer.addEventListener('click', this.settingsHandler);
   }
 
   private createButtons() {
     const timerTypesDiv = document.createElement('div') as HTMLDivElement;
-    timerTypesDiv.className = 'timer-type';
+    timerTypesDiv.className = 'utilitie__flex-wrap-3gap';
     this.sectionTimerEl.insertAdjacentElement('afterbegin', timerTypesDiv);
     this.sectionTimerEl.style.width = 'fit-content';
 
     let buttons = [];
-    this._btnFocusTimer = document.createElement('zk-button') as ButtonComponent;
+    this._btnFocusTimer = document.createElement(
+      'zk-button'
+    ) as ButtonComponent;
     this._btnFocusTimer.textContent = 'Focus Time';
     this._selectedBtn = this._btnFocusTimer;
     this._lastBtnClicked = this._btnFocusTimer;
 
-    this._btnShortBreak = document.createElement('zk-button') as ButtonComponent;
+    this._btnShortBreak = document.createElement(
+      'zk-button'
+    ) as ButtonComponent;
     this._btnShortBreak.textContent = 'Short Break';
 
     this._btnLongBreak = document.createElement('zk-button') as ButtonComponent;
@@ -54,7 +79,7 @@ class Pomodoro extends TimerWithProgressBar {
   private customiseButtons(btn: ButtonComponent) {
     btn.addEventListener('mouseover', this.mouseHoverColorHandler);
     btn.addEventListener('mouseleave', this.mouseLeaveColorHandler);
-    btn.addEventListener('click', this.checkTimerStatusHandler);
+    btn.addEventListener('click', this.manageTimerStatusHandler);
     btn.setAttribute('background-color', 'transparent');
   }
 
@@ -76,10 +101,24 @@ class Pomodoro extends TimerWithProgressBar {
     }
   };
 
-  private checkTimerStatusHandler = (event: Event) => {
+  private manageTimerStatusHandler = (event: Event) => {
     if (this._selectedBtn === event.target) return;
     this._lastBtnClicked = event.target as ButtonComponent;
 
+    if (
+      this.timer.status === TimerStatus.Running ||
+      this.timer.status === TimerStatus.Paused
+    ) {
+      this.checkStatus();
+      return;
+    }
+
+    this._selectedBtn = this._lastBtnClicked;
+    this.setCurrentTimeAndColor();
+    this.updateUiColor();
+  };
+
+  private checkStatus = () => {
     if (this.timer.status === TimerStatus.Running) {
       super.pauseHandler();
       this.showModal();
@@ -92,10 +131,6 @@ class Pomodoro extends TimerWithProgressBar {
       this.showModal();
       return;
     }
-
-    this._selectedBtn = this._lastBtnClicked;
-    this.setCurrentTimeAndColor();
-    this.updateUiColor();
   };
 
   private setCurrentTimeAndColor() {
@@ -105,13 +140,13 @@ class Pomodoro extends TimerWithProgressBar {
     );
 
     if (this._selectedBtn === this._btnFocusTimer) {
-      this.timer.setMinSec(25, 0);
+      this.timer.setMinSec(this._enteredFocusMin ?? 25, 0);
       this.colorTheme = DEFAULT_COLORS.red;
     } else if (this._selectedBtn === this._btnShortBreak) {
-      this.timer.setMinSec(0, 5);
+      this.timer.setMinSec(this._enteredShortBreakMin ?? 5, 0);
       this.colorTheme = DEFAULT_COLORS.teal;
     } else if (this._selectedBtn === this._btnLongBreak) {
-      this.timer.setMinSec(10, 0);
+      this.timer.setMinSec(this._enteredLongBreakMin ?? 10, 0);
       this.colorTheme = DEFAULT_COLORS.indigo;
     }
 
@@ -143,7 +178,9 @@ class Pomodoro extends TimerWithProgressBar {
   };
 
   private createModal() {
-    this._modal = document.createElement('zk-modal-container') as ModalComponent;
+    this._modal = document.createElement(
+      'zk-modal-container'
+    ) as ModalComponent;
     this._modal.style.color = 'rgb(73, 26, 26)';
 
     const title = document.createElement('h2') as HTMLHeadingElement;
@@ -152,7 +189,7 @@ class Pomodoro extends TimerWithProgressBar {
     title.setAttribute('slot', 'title');
 
     const subtitle = document.createElement('p') as HTMLParagraphElement;
-    subtitle.textContent = `The timer will stop if you continue. Are you sure you want to leave?`;
+    subtitle.textContent = `The timer will reset if you continue. Are you sure you want to leave?`;
     subtitle.setAttribute('slot', 'subtitle');
 
     this._modal.append(title, subtitle);
@@ -174,6 +211,9 @@ class Pomodoro extends TimerWithProgressBar {
     this.setCurrentTimeAndColor();
     this.updateUiColor();
     this._lastBtnClicked.dispatchEvent(new Event('mouseleave'));
+    if (this._isSettingClicked) {
+      this.showSettingModal();
+    }
   };
 
   private cancelModalHandler = () => {
@@ -186,6 +226,57 @@ class Pomodoro extends TimerWithProgressBar {
     this.progressBar.setAttribute('progress', '0');
     this.timerTextEl.textContent = this.timer.displayTime;
   }
+
+  private createModalSettings = () => {
+    this._settingsModalEl = document.createElement(
+      'zk-settings-modal'
+    ) as SettingsModal;
+    this._settingsModalEl.addEventListener(
+      'confirmSettings',
+      this.updateUserSettingHandler
+    );
+    this.hostElement.append(this._settingsModalEl);
+  };
+
+  private updateUserSettingHandler = () => {
+    const values = this._settingsModalEl.userMinutes;
+
+    this._enteredFocusMin = values.focusTimeMin;
+    this._enteredShortBreakMin = values.shortBreakMin;
+    this._enteredLongBreakMin = values.longBreakMin;
+
+    this._settingsModalEl.setAttribute(
+      'focus-time',
+      `${this._enteredFocusMin}` ?? '25'
+    );
+    this._settingsModalEl.setAttribute(
+      'short-break',
+      `${this._enteredShortBreakMin}` ?? '5'
+    );
+    this._settingsModalEl.setAttribute(
+      'long-break',
+      `${this._enteredLongBreakMin}` ?? '10'
+    );
+
+    this.setCurrentTimeAndColor();
+  };
+
+  private settingsHandler = () => {
+    this._isSettingClicked = true;
+    if (
+      this.timer.status !== TimerStatus.Running &&
+      this.timer.status !== TimerStatus.Paused
+    ) {
+      this.showSettingModal();
+      return;
+    }
+    this.checkStatus();
+  };
+
+  private showSettingModal = () => {
+    this._isSettingClicked = false;
+    this._settingsModalEl.show();
+  };
 }
 
 export default Pomodoro;

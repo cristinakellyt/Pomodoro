@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/app.ts',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'assets', 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '',
   },
   devtool: 'cheap-module-source-map',
@@ -14,7 +14,7 @@ module.exports = {
   devServer: {
     port: 9000,
     static: {
-      directory: path.resolve(__dirname, 'assets', 'dist'),
+      directory: path.resolve(__dirname, 'dist'),
     },
     devMiddleware: {
       index: 'index.html',
@@ -43,8 +43,8 @@ module.exports = {
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.hbs$/,
-        use: ['handlebars-loader'],
+        test: /\.svg$/,
+        use: 'file-loader',
       },
     ],
   },
@@ -56,7 +56,7 @@ module.exports = {
       cleanOnceBeforeBuildPatterns: ['**/*'],
     }),
     new HtmlWebpackPlugin({
-      template: 'src/index.hbs',
+      template: 'src/index.html',
     }),
-  ],
+   ],
 };
